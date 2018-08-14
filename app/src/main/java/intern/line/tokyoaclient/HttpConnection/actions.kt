@@ -35,21 +35,19 @@ fun getAllUsers(): List<UserProfile> {
 
 fun getName(id: String): String? {
     // 非同期処理
-    // 同期処理(以下)をするとアプリが落ちる
-    // service.getUserById(id).execute()
     var name: String? = null
-    service.getUserById(id).enqueue(object : Callback<List<UserProfile>> {
+    service.getUserById(id).enqueue(object : Callback<UserProfile> {
         public override fun onResponse(
-                call: Call<List<UserProfile>>?,
-                response: Response<List<UserProfile>>?) {
+                call: Call<UserProfile>?,
+                response: Response<UserProfile>?) {
             response?.body()?.let {
                 // 通信成功
-                name = it[0].name
+                name = it.name
                 println(it.toString())
             }
         }
 
-        public override fun onFailure(call: Call<List<UserProfile>>?, t: Throwable?) {
+        public override fun onFailure(call: Call<UserProfile>?, t: Throwable?) {
             t?.let {
                 // 通信失敗
                 // name = null

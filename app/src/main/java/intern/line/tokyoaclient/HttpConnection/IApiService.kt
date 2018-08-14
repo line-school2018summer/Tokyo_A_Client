@@ -9,7 +9,7 @@ interface IApiService {
     fun getAllUsers(): Call<List<UserProfile>>
 
     @GET("/user/id/{id}")
-    fun getUserById(@Path("id") id: String): Call<List<UserProfile>>
+    fun getUserById(@Path("id") id: String): Call<UserProfile>
 
     @GET("/user/name/{name}")
     fun getUserByName(@Path("name") name: String): Call<List<UserProfile>>
