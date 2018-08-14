@@ -73,6 +73,23 @@ class MainActivity : AppCompatActivity() {
                         var userId = currentUser?.email
                         (findViewById(R.id.resultText) as TextView).text = getString(R.string.result, userId)
 
+                                                // GETのテスト
+                        // res_getAllUsersは予めグローバル変数として定義して，actions.ktのgetAllUsersで代入したもの
+                        // res_getAllUsers_localはローカル変数としてgetAllUsers内で定義したものを返り値として返したもの
+                        // 何故かres_getAllUsers_localの方法はうまくいかない．res_getAllUsersも何故か1回目は入らない，
+                        var res_getAllUsers_local = getAllUsers().toMutableList()
+                        println("res_getAllUsers: " + res_getAllUsers.toString()) // res_getAllUsers: [] (1回目), res_getAllUsers: [UserProfile(id=fjalkcmipizx, name=barbar, created_at=2018-08-14 06:03:16.0, updated_at=2018-01-01 00:00:00.0), ...] (2回目)
+                        println("res_getAllUsers_local: " + res_getAllUsers_local.toString()) // res_getAllUsers_local: []
+
+                        getUserById("fjalkcmipizx")
+                        println("res_getUserById: " + res_getUserById.toString()) // res_getAllUsersと同様の結果
+
+                        getUsersByName("itohdak")
+                        println("res_getUsersByName: " + res_getUsersByName.toString()) // res_getAllUsersと同様の結果
+
+                        getUsersByLikelyName("itohdak")
+                        println("res_getUsersByLikelyName: " + res_getUsersByLikelyName.toString()) // res_getAllUsersと同様の結果
+
                         // POSTのテスト
                         // actions.ktのcreateAccountでonFailureに入って"create failure"と出てしまう
                         // しかし，データベースを見てみるとちゃんと追加されている
@@ -80,13 +97,11 @@ class MainActivity : AppCompatActivity() {
                         if(uid != null && userId != null)
                             createAccount(uid.toString(), userId.toString())
 
-                        // GETのテスト
-                        // res1は予めグローバル変数として定義して，actions.ktのgetAllUsersで代入したもの
-                        // res2はローカル変数としてgetAllUsers内で定義したものを返り値として返したもの
-                        // 何故かres2の方法はうまくいかない．res1も何故か1回目は入らない，
-                        var res2 = getAllUsers().toMutableList()
-                        println("res1: " + res1.toString()) // res1: [] (1回目) res1: [UserProfile(id=fjalkcmipizx, name=barbar, created_at=2018-08-14 06:03:16.0, updated_at=2018-01-01 00:00:00.0), ...] (2回目)
-                        println("res2: " + res2.toString()) // res2: []
+                        // PUTのテスト
+                        modifyAccount("9xmdsm9fqoij", "hogehoge")
+
+                        // DELETEのテスト
+                        deleteAccount("fjalkcmipizx")
 
                     } else {
                         //Sign in Error
