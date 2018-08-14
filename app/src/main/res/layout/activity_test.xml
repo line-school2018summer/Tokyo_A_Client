@@ -4,10 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".DebugActivity">
 
     <EditText
-        android:id="@+id/mailText"
+        android:id="@+id/idText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="85dp"
@@ -16,14 +16,14 @@
         android:layout_marginStart="84dp"
         android:layout_marginTop="56dp"
         android:ems="10"
-        android:hint="Email"
-        android:inputType="textEmailAddress"
+        android:hint="Id"
+        android:inputType="text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText
-        android:id="@+id/passwordText"
+        android:id="@+id/nameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="63dp"
@@ -33,56 +33,50 @@
         android:layout_marginStart="84dp"
         android:layout_marginTop="34dp"
         android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword"
+        android:hint="Name"
+        android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/signin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mailText" />
+        app:layout_constraintTop_toBottomOf="@+id/idText" />
 
     <Button
-        android:id="@+id/signin"
-        android:layout_width="wrap_content"
+        android:id="@+id/get"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="232dp"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:text="sign in"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/signup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="155dp"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="29dp"
-        android:text="sign up"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginLeft="48dp"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="64dp"
+        android:text="get"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signin" />
+        app:layout_constraintTop_toBottomOf="@+id/nameText" />
 
     <Button
-        android:id="@+id/test"
-        android:layout_width="wrap_content"
+        android:id="@+id/post"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="104dp"
-        android:text="go test"
+        android:text="push (add)"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
+        app:layout_constraintStart_toEndOf="@+id/get"
+        app:layout_constraintTop_toTopOf="@+id/get" />
+
+    <Button
+        android:id="@+id/put"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="put (modify)"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/get"
+        app:layout_constraintTop_toBottomOf="@+id/get"
+        app:layout_constraintVertical_bias="0.263" />
+
+    <Button
+        android:id="@+id/delete"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:text="delete"
+        app:layout_constraintStart_toStartOf="@+id/post"
+        app:layout_constraintTop_toTopOf="@+id/put" />
 
     <TextView
         android:id="@+id/resultText"
@@ -92,12 +86,12 @@
         android:layout_marginLeft="64dp"
         android:layout_marginRight="64dp"
         android:layout_marginStart="64dp"
-        android:layout_marginTop="31dp"
+        android:layout_marginTop="60dp"
         android:gravity="center"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
+        app:layout_constraintTop_toBottomOf="@+id/put" />
 
 </android.support.constraint.ConstraintLayout>

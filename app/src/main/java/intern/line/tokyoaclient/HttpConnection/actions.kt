@@ -8,6 +8,7 @@ var res_getAllUsers: List<UserProfile> = mutableListOf<UserProfile>()
 var res_getUsersByName: List<UserProfile> = mutableListOf<UserProfile>()
 var res_getUserById: UserProfile = UserProfile()
 var res_getUsersByLikelyName: List<UserProfile> = mutableListOf<UserProfile>()
+var res_deleteUser: UserProfile = UserProfile()
 
 fun getAllUsers(): List<UserProfile> {
     var res: List<UserProfile> = mutableListOf<UserProfile>()
@@ -17,7 +18,7 @@ fun getAllUsers(): List<UserProfile> {
             .subscribe({
                 res_getAllUsers = it
                 res = it
-                println("get success")
+                println("get success: $it")
             }, {
                 println("get failure")
             })
@@ -32,7 +33,7 @@ fun getUserById(id: String): UserProfile {
             .subscribe({
                 res_getUserById = it
                 res = it
-                println("get id success")
+                println("get id success: $it")
             }, {
                 println("get id failure")
             })
@@ -47,7 +48,7 @@ fun getUsersByName(name: String): List<UserProfile> {
             .subscribe({
                 res_getUsersByName = it
                 res = it
-                println("get name success")
+                println("get name success: $it")
             }, {
                 println("get name failure")
             })
@@ -62,7 +63,7 @@ fun getUsersByLikelyName(name: String): List<UserProfile> {
             .subscribe({
                 res_getUsersByLikelyName = it
                 res = it
-                println("get likelyname success")
+                println("get likelyname success: $it")
             }, {
                 println("get likelyname failure")
             })
@@ -76,7 +77,7 @@ fun createAccount(id: String, name: String): Boolean {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 success = true
-                println("create success")
+                println("create success: $it")
             }, {
                 println("create failure")
             })
@@ -90,23 +91,24 @@ fun modifyAccount(id: String, name: String): Boolean {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
                 success = true
-                println("modify success")
+                println("modify success: $it")
             }, {
                 println("modify failure")
             })
     return success
 }
 
-fun deleteAccount(id: String): Boolean {
-    var success: Boolean = false
+fun deleteAccount(id: String): UserProfile {
+    var res: UserProfile = UserProfile()
     service.deleteUser(id)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
-                success = true
+                res_deleteUser = it
+                res = it
                 println("delete success: $it")
             }, {
                 println("delete failure")
             })
-    return success
+    return res
 }

@@ -1,7 +1,9 @@
 package intern.line.tokyoaclient
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import android.widget.TextView
@@ -26,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         //ボタンをゲットしておく
         val signupButton = findViewById(R.id.signup) as Button
         val signinButton = findViewById(R.id.signin) as Button
+        val testButton = findViewById(R.id.test) as Button
 
         //それぞれのボタンが押されたときにメソッドを呼び出す
         signupButton.setOnClickListener {
@@ -34,6 +37,10 @@ class MainActivity : AppCompatActivity() {
         signinButton.setOnClickListener {
             signIn()
         }
+        testButton.setOnClickListener {
+            intent()
+        }
+
     }
 
 
@@ -72,42 +79,17 @@ class MainActivity : AppCompatActivity() {
                         currentUser = FirebaseAuth.getInstance().currentUser
                         var userId = currentUser?.email
                         (findViewById(R.id.resultText) as TextView).text = getString(R.string.result, userId)
-
-                                                // GETのテスト
-                        // res_getAllUsersは予めグローバル変数として定義して，actions.ktのgetAllUsersで代入したもの
-                        // res_getAllUsers_localはローカル変数としてgetAllUsers内で定義したものを返り値として返したもの
-                        // 何故かres_getAllUsers_localの方法はうまくいかない．res_getAllUsersも何故か1回目は入らない，
-                        var res_getAllUsers_local = getAllUsers().toMutableList()
-                        println("res_getAllUsers: " + res_getAllUsers.toString()) // res_getAllUsers: [] (1回目), res_getAllUsers: [UserProfile(id=fjalkcmipizx, name=barbar, created_at=2018-08-14 06:03:16.0, updated_at=2018-01-01 00:00:00.0), ...] (2回目)
-                        println("res_getAllUsers_local: " + res_getAllUsers_local.toString()) // res_getAllUsers_local: []
-
-                        getUserById("fjalkcmipizx")
-                        println("res_getUserById: " + res_getUserById.toString()) // res_getAllUsersと同様の結果
-
-                        getUsersByName("itohdak")
-                        println("res_getUsersByName: " + res_getUsersByName.toString()) // res_getAllUsersと同様の結果
-
-                        getUsersByLikelyName("itohdak")
-                        println("res_getUsersByLikelyName: " + res_getUsersByLikelyName.toString()) // res_getAllUsersと同様の結果
-
-                        // POSTのテスト
-                        // actions.ktのcreateAccountでonFailureに入って"create failure"と出てしまう
-                        // しかし，データベースを見てみるとちゃんと追加されている
-                        var uid = currentUser?.uid
-                        if(uid != null && userId != null)
-                            createAccount(uid.toString(), userId.toString())
-
-                        // PUTのテスト
-                        modifyAccount("9xmdsm9fqoij", "hogehoge")
-
-                        // DELETEのテスト
-                        deleteAccount("fjalkcmipizx")
-
                     } else {
                         //Sign in Error
                         Toast.makeText(this, "Error: ${task.exception?.message}", Toast.LENGTH_LONG).show()
                     }
                 }
+    }
+
+    public fun intent() {
+        var intent: Intent = Intent(this, DebugActivity::class.java)
+        intent.putExtra("TestNum", 1)
+        startActivity(intent)
     }
 }
 
