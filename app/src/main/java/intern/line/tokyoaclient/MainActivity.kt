@@ -9,6 +9,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import intern.line.tokyoaclient.HttpConnection.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -67,10 +68,23 @@ class MainActivity : AppCompatActivity() {
                 .addOnCompleteListener { task: Task<AuthResult> ->
                     if (task.isSuccessful) {
                         //Sign in OK
-                        Toast.makeText(this,"succeeded", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "succeeded", Toast.LENGTH_LONG).show()
                         currentUser = FirebaseAuth.getInstance().currentUser
                         var userId = currentUser?.email
                         (findViewById(R.id.resultText) as TextView).text = getString(R.string.result, userId)
+
+
+                        var providerId = currentUser?.uid
+                        if(providerId != null && userId != null)
+                            createAccount(providerId.toString(), userId.toString())
+
+
+                        // 何故かres2の方法はうまくいかない．res1も何故か1回目は入らない，
+                        var res2 = getAllUsers().toMutableList()
+                        println("res1: " + res1.toString())
+                        println("res2: " + res2.toString())
+
+
 
                     } else {
                         //Sign in Error
