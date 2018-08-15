@@ -2,17 +2,19 @@ package intern.line.tokyoaclient
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
+import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.*
-
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import java.util.concurrent.CountDownLatch
 
 
 class DebugActivity : AppCompatActivity() {
 
     lateinit var idText: EditText
     lateinit var nameText: EditText
+    lateinit var listView: ListView
+    lateinit var adapter: ArrayAdapter<UserProfile>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,6 +22,12 @@ class DebugActivity : AppCompatActivity() {
 
         idText = findViewById(R.id.idText) as EditText
         nameText = findViewById(R.id.nameText) as EditText
+
+        listView = findViewById(R.id.listview) as ListView
+        var data: ArrayList<UserProfile> = ArrayList<UserProfile>()
+        adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, data)
+        listView.setAdapter(adapter)
+
 
         //ボタンをゲットしておく
         val getButton = findViewById(R.id.get) as Button
@@ -45,65 +53,95 @@ class DebugActivity : AppCompatActivity() {
     public fun get() {
         val idStr = idText.text.toString()
         val nameStr = nameText.text.toString()
+        adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
-        // GETのテスト
-        // res_getAllUsersは予めグローバル変数として定義して，actions.ktのgetAllUsersで代入したもの
-        // res_getAllUsers_localはローカル変数としてgetAllUsers内で定義したものを返り値として返したもの
-        // 何故かres_getAllUsers_localの方法はうまくいかない．res_getAllUsersも何故か1回目は入らない，
-        var res_getAllUsers_local = getAllUsers().toMutableList()
-        println("res_getAllUsers: " + res_getAllUsers.toString()) // res_getAllUsers: [] (1回目), res_getAllUsers: [UserProfile(id=fjalkcmipizx, name=barbar, created_at=2018-08-14 06:03:16.0, updated_at=2018-01-01 00:00:00.0), ...] (2回目)
-        println("res_getAllUsers_local: " + res_getAllUsers_local.toString()) // res_getAllUsers_local: []
+        if (idStr != "") {
+            service.getUserById(idStr)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        adapter.add(it)
+                        Toast.makeText(this, "get id succeeded", Toast.LENGTH_LONG).show()
+                        println("get id succeeded: $it")
+                    }, {
+                        Toast.makeText(this, "get id failed: $it", Toast.LENGTH_LONG).show()
+                        println("get id failed: $it")
+                    })
+        } else {
+            if (nameStr != "") {
+                service.getUserByLikelyName(nameStr)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            adapter.addAll(it)
+                            Toast.makeText(this, "get name succeeded", Toast.LENGTH_LONG).show()
+                            println("get name succeeded: $it")
+                        }, {
+                            Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
+                            println("get name failed: $it")
+                        })
+            }
+        }
 
-        getUserById(idStr)
-        println("res_getUserById: " + res_getUserById.toString()) // res_getAllUsersと同様の結果
-        if(res_getUserById.id != "default")
-            Toast.makeText(this, "get id success: $res_getUserById", Toast.LENGTH_LONG).show()
-        else
-            Toast.makeText(this, "get id failure", Toast.LENGTH_LONG).show()
-
-        getUsersByName(nameStr)
-        println("res_getUsersByName: " + res_getUsersByName.toString()) // res_getAllUsersと同様の結果
-
-        getUsersByLikelyName(nameStr)
-        println("res_getUsersByLikelyName: " + res_getUsersByLikelyName.toString()) // res_getAllUsersと同様の結果
+        listView.setAdapter(adapter)
     }
 
     public fun post() {
         val idStr = idText.text.toString()
         val nameStr = nameText.text.toString()
-        // POSTのテスト
-        // actions.ktのcreateAccountでonFailureに入って"create failure"と出てしまう
-        // しかし，データベースを見てみるとちゃんと追加されている
-        val res = createAccount(idStr.toString(), nameStr.toString())
-        if(res) {
-            Toast.makeText(this, "create success", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, "create failure", Toast.LENGTH_LONG).show()
-        }
+        adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
+
+        service.addUser(idStr, nameStr)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Toast.makeText(this, "create succeeded", Toast.LENGTH_LONG).show()
+                println("create succeeded")
+            }, {
+                Toast.makeText(this, "create failed: $it", Toast.LENGTH_LONG).show()
+                println("create failed: $it")
+            })
+
+        listView.setAdapter(adapter)
     }
 
     public fun put() {
         val idStr = idText.text.toString()
         val nameStr = nameText.text.toString()
-        // PUTのテスト
-        // こちらもPOSTと同じ．failureと出るがちゃんと更新されている
-        val res = modifyAccount(idStr, nameStr)
-        if(res) {
-            Toast.makeText(this, "modify success", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(this, "modify failure", Toast.LENGTH_LONG).show()
-        }
+        adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
+
+        service.modifyUser(idStr, nameStr)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                Toast.makeText(this, "modify succeeded", Toast.LENGTH_LONG).show()
+                println("modify successed")
+            }, {
+                Toast.makeText(this, "modify failed: $it", Toast.LENGTH_LONG).show()
+                println("modify failed: $it")
+            })
+
+        listView.setAdapter(adapter)
     }
 
     public fun delete() {
         val idStr = idText.text.toString()
         val nameStr = nameText.text.toString()
-        // DELETEのテスト
-        val res = deleteAccount(idStr)
-        if(res_deleteUser.id != "default")
-            Toast.makeText(this, "delete success: $res_deleteUser", Toast.LENGTH_LONG).show()
-        else
-            Toast.makeText(this, "delete failure", Toast.LENGTH_LONG).show()
+        adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
+
+        service.deleteUser(idStr)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({
+                adapter.add(it)
+                Toast.makeText(this, "delete succeeded", Toast.LENGTH_LONG).show()
+                println("delete succeeded: $it")
+            }, {
+                Toast.makeText(this, "delete failed: $it", Toast.LENGTH_LONG).show()
+                println("delete failed: $it")
+            })
+
+        listView.setAdapter(adapter)
     }
 }
 
