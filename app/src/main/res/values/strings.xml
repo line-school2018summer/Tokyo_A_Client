@@ -1,4 +1,3 @@
 <resources>
     <string name="app_name">TokyoAClient</string>
-    <string name="result">Hello, %s!</string>
 </resources>
