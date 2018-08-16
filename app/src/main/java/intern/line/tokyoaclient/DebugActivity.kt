@@ -6,22 +6,24 @@ import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.util.concurrent.CountDownLatch
 
 
 class DebugActivity : AppCompatActivity() {
 
-    lateinit var idText: EditText
-    lateinit var nameText: EditText
-    lateinit var listView: ListView
-    lateinit var adapter: ArrayAdapter<UserProfile>
+    private lateinit var idText: EditText
+    private lateinit var nameText: EditText
+    private lateinit var listView: ListView
+    private lateinit var adapter: ArrayAdapter<UserProfile>
+
+    private lateinit var idStr: String
+    private lateinit var nameStr: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_debug)
 
-        idText = findViewById(R.id.idText) as EditText
-        nameText = findViewById(R.id.nameText) as EditText
+        idText = findViewById(R.id.idDebug) as EditText
+        nameText = findViewById(R.id.nameDebug) as EditText
 
         listView = findViewById(R.id.listview) as ListView
         var data: ArrayList<UserProfile> = ArrayList<UserProfile>()
@@ -51,8 +53,8 @@ class DebugActivity : AppCompatActivity() {
     }
 
     public fun get() {
-        val idStr = idText.text.toString()
-        val nameStr = nameText.text.toString()
+        idStr = idText.text.toString()
+        nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
         if (idStr != "") {
@@ -87,8 +89,8 @@ class DebugActivity : AppCompatActivity() {
     }
 
     public fun post() {
-        val idStr = idText.text.toString()
-        val nameStr = nameText.text.toString()
+        idStr = idText.text.toString()
+        nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
         service.addUser(idStr, nameStr)
@@ -106,8 +108,8 @@ class DebugActivity : AppCompatActivity() {
     }
 
     public fun put() {
-        val idStr = idText.text.toString()
-        val nameStr = nameText.text.toString()
+        idStr = idText.text.toString()
+        nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
         service.modifyUser(idStr, nameStr)
@@ -125,8 +127,8 @@ class DebugActivity : AppCompatActivity() {
     }
 
     public fun delete() {
-        val idStr = idText.text.toString()
-        val nameStr = nameText.text.toString()
+        idStr = idText.text.toString()
+        nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
         service.deleteUser(idStr)
