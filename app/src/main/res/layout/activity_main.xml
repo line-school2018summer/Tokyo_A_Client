@@ -7,35 +7,37 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/mailText"
+        android:id="@+id/nameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="85dp"
-        android:layout_marginLeft="84dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginStart="84dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginBottom="41dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginLeft="85dp"
+        android:layout_marginRight="84dp"
+        android:layout_marginStart="85dp"
+        android:layout_marginTop="18dp"
         android:ems="10"
-        android:hint="Email"
+        android:hint="(Name if you sign up)"
         android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@+id/signin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/passwordText" />
 
     <EditText
         android:id="@+id/passwordText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="63dp"
-        android:layout_marginEnd="85dp"
-        android:layout_marginLeft="84dp"
-        android:layout_marginRight="85dp"
-        android:layout_marginStart="84dp"
-        android:layout_marginTop="34dp"
+        android:layout_marginBottom="32dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginLeft="85dp"
+        android:layout_marginRight="84dp"
+        android:layout_marginStart="85dp"
+        android:layout_marginTop="26dp"
         android:ems="10"
         android:hint="Password"
         android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/signin"
+        app:layout_constraintBottom_toTopOf="@+id/nameText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mailText" />
@@ -70,34 +72,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/signin" />
 
-    <Button
-        android:id="@+id/test"
+    <EditText
+        android:id="@+id/mailText"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="104dp"
-        android:text="go test"
+        android:layout_height="40dp"
+        android:layout_marginBottom="26dp"
+        android:layout_marginEnd="84dp"
+        android:layout_marginLeft="85dp"
+        android:layout_marginRight="84dp"
+        android:layout_marginStart="85dp"
+        android:layout_marginTop="44dp"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        app:layout_constraintBottom_toTopOf="@+id/passwordText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
-
-    <TextView
-        android:id="@+id/resultText"
-        android:layout_width="256dp"
-        android:layout_height="62dp"
-        android:layout_marginEnd="64dp"
-        android:layout_marginLeft="64dp"
-        android:layout_marginRight="64dp"
-        android:layout_marginStart="64dp"
-        android:layout_marginTop="31dp"
-        android:gravity="center"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signup" />
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
