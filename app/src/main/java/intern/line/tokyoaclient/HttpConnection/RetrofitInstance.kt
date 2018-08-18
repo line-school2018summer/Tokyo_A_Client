@@ -2,6 +2,7 @@ package intern.line.tokyoaclient.HttpConnection
 
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import intern.line.tokyoaclient.HttpConnection.service.*
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
@@ -17,4 +18,6 @@ val retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create(gson))
         .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
         .build()
-val service: IApiService = retrofit.create(IApiService::class.java)
+
+val userProfileService: UserProfileService = retrofit.create(UserProfileService::class.java)
+val talkService: TalkService = retrofit.create(TalkService::class.java)
