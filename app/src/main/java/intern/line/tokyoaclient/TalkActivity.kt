@@ -47,7 +47,7 @@ class TalkActivity : AppCompatActivity() {
             getAllMessages()
         }
 
-        // Timer().schedule(0, 1000, { getMessage() })
+        Timer().schedule(0, 1000, { getMessage() })
     }
 
 
@@ -61,14 +61,14 @@ class TalkActivity : AppCompatActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        Toast.makeText(this, "send talk succeeded", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "send talk succeeded", Toast.LENGTH_SHORT).show()
                         println("send talk succeeded: $input")
 
                         getMessage()
                         inputText.editableText.clear() // 入力内容をリセットする
                         talkList.setSelection(adapter.count)
                     }, {
-                        Toast.makeText(this, "send talk failed: $it", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, "send talk failed: $it", Toast.LENGTH_SHORT).show()
                         println("send talk failed: $it")
                     })
         }
@@ -90,7 +90,7 @@ class TalkActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get talk succeeded", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "get talk succeeded", Toast.LENGTH_SHORT).show()
                     println("get talk succeeded: $it")
 
                     if(!it.isEmpty()) {
@@ -102,7 +102,7 @@ class TalkActivity : AppCompatActivity() {
                     println("sinceTalkId: $sinceTalkId")
                     talkList.setSelection(adapter.count)
                 }, {
-                    Toast.makeText(this, "get talk failed: $it", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "get talk failed: $it", Toast.LENGTH_SHORT).show()
                     println("get talk failed: $it")
                 })
     }
