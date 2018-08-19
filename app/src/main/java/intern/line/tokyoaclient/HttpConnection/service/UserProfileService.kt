@@ -1,13 +1,12 @@
-package intern.line.tokyoaclient.HttpConnection
+package intern.line.tokyoaclient.HttpConnection.service
 
-import retrofit2.Call
+import intern.line.tokyoaclient.HttpConnection.model.UserProfile
 import retrofit2.http.*
 import rx.Completable
-import rx.Observable
 import rx.Single
 
 
-interface IApiService {
+interface UserProfileService {
     @GET("/user")
     fun getAllUsers(): Single<List<UserProfile>>
 
@@ -28,4 +27,5 @@ interface IApiService {
 
     @DELETE("/user/delete/{id}")
     fun deleteUser(@Path("id") id: String): Single<UserProfile>
+
 }

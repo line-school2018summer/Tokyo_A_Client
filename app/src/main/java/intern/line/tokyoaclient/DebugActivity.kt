@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.*
+import intern.line.tokyoaclient.HttpConnection.model.UserProfile
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
@@ -58,7 +59,7 @@ class DebugActivity : AppCompatActivity() {
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
         if (idStr != "") {
-            service.getUserById(idStr)
+            userProfileService.getUserById(idStr)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
@@ -71,7 +72,7 @@ class DebugActivity : AppCompatActivity() {
                     })
         } else {
             if (nameStr != "") {
-                service.getUserByLikelyName(nameStr)
+                userProfileService.getUserByLikelyName(nameStr)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -93,7 +94,7 @@ class DebugActivity : AppCompatActivity() {
         nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
-        service.addUser(idStr, nameStr)
+        userProfileService.addUser(idStr, nameStr)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -112,7 +113,7 @@ class DebugActivity : AppCompatActivity() {
         nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
-        service.modifyUser(idStr, nameStr)
+        userProfileService.modifyUser(idStr, nameStr)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({
@@ -131,7 +132,7 @@ class DebugActivity : AppCompatActivity() {
         nameStr = nameText.text.toString()
         adapter = ArrayAdapter<UserProfile>(this, android.R.layout.simple_list_item_1, ArrayList<UserProfile>())
 
-        service.deleteUser(idStr)
+        userProfileService.deleteUser(idStr)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({

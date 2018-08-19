@@ -17,10 +17,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DebugActivity">
-        </activity>
-        <activity android:name=".MainPageActivity">
-        </activity>
+        <activity android:name=".DebugActivity" />
+        <activity android:name=".MainPageActivity" />
+        <activity android:name=".TalkActivity" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
 

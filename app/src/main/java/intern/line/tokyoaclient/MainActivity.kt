@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createAccount(idStr: String,nameStr:String) {
-            service.addUser(idStr, nameStr)
+            userProfileService.addUser(idStr, nameStr)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
