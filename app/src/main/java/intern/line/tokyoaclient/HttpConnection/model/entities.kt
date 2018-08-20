@@ -18,3 +18,9 @@ data class Talk(
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
+
+data class Image(
+        var id: Long,
+        var fileName: String,
+        var rawData: ByteArray
+)
