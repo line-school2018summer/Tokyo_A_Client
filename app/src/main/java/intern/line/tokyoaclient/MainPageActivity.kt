@@ -9,7 +9,11 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.facebook.stetho.Stetho
 import intern.line.tokyoaclient.HttpConnection.*
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
@@ -23,13 +27,15 @@ class MainPageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main_page)
         userId = intent.getStringExtra("userId")
         getName(userId)
 
         imageView = findViewById(R.id.iconImage) as ImageView
-        importImage("github_logo.png")
-        postImage("github_logo.png")
+        // importImage("github_logo.png")
+        // postImage("github_logo.png")
+        getImage(2)
 
         val goToTalkRoomButton = findViewById(R.id.goToTalkRoomButton) as Button
         goToTalkRoomButton.setOnClickListener {
@@ -63,15 +69,21 @@ class MainPageActivity : AppCompatActivity() {
     }
 
     private fun postImage(pathToImage: String) {
-        try {resources.assets.open(pathToImage).use { istream ->
+        try {
+            resources.assets.open(pathToImage).use { istream ->
                 val bitmap: Bitmap = BitmapFactory.decodeStream(istream)
-                val byteArray = bitmapToByteArray(bitmap)
-                imageService.addImage("test_image", byteArray)
+                imageView.setImageBitmap(bitmap) // 表示
+
+                val content = bitmapToByteArray(bitmap) // ByteArray
+                val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
+                val body = MultipartBody.Part.createFormData("file", pathToImage, requestFile); // 第一引数はサーバ側の@RequestParamの名前と一致させる
+
+                imageService.addImage(body)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
-                            Toast.makeText(this, "post image succeed", Toast.LENGTH_SHORT).show()
-                            println("post image succeed")
+                            Toast.makeText(this, "post image succeeded", Toast.LENGTH_SHORT).show()
+                            println("post image succeeded")
                         }, {
                             Toast.makeText(this, "post image failed: $it", Toast.LENGTH_SHORT).show()
                             println("post image failed: $it")
@@ -79,7 +91,25 @@ class MainPageActivity : AppCompatActivity() {
             }
         } catch (e: IOException) {
             e.printStackTrace()
+        } finally {
+            println("unknown error")
         }
+    }
+
+    private fun getImage(id: Long) {
+        imageService.getImageById(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(this, "get image succeeded", Toast.LENGTH_SHORT).show()
+                    println("get image succeeded")
+                    // val blob = it.rawData
+                    // val bitmap = BitmapFactory.decodeByteArray(blob, 0, blob.size)
+                    // imageView.setImageBitmap(bitmap)
+                }, {
+                    Toast.makeText(this, "get image failed: $it", Toast.LENGTH_SHORT).show()
+                    println("get image failed: $it")
+                })
     }
 
     private fun bitmapToByteArray (bitmap: Bitmap): ByteArray {
