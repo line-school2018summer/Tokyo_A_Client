@@ -9,7 +9,6 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import com.facebook.stetho.Stetho
 import intern.line.tokyoaclient.HttpConnection.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -27,7 +26,6 @@ class MainPageActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Stetho.initializeWithDefaults(this);
         setContentView(R.layout.activity_main_page)
         userId = intent.getStringExtra("userId")
         getName(userId)
