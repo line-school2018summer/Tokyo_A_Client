@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import intern.line.tokyoaclient.HttpConnection.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -31,9 +32,17 @@ class MainPageActivity : AppCompatActivity() {
         getName(userId)
 
         imageView = findViewById(R.id.iconImage) as ImageView
-        // importImage("github_logo.png")
-        // postImage("github_logo.png")
-        getImage(2)
+
+        val postImageButton = findViewById(R.id.postImageButton) as Button
+        postImageButton.setOnClickListener {
+            // importImage("github_logo.png")
+            postImage(userId, "github_logo.png")
+        }
+
+        val getImageButton = findViewById(R.id.getImageButton) as Button
+        getImageButton.setOnClickListener {
+            getImage(userId)
+        }
 
         val goToTalkRoomButton = findViewById(R.id.goToTalkRoomButton) as Button
         goToTalkRoomButton.setOnClickListener {
@@ -66,7 +75,8 @@ class MainPageActivity : AppCompatActivity() {
         }
     }
 
-    private fun postImage(pathToImage: String) {
+    private fun postImage(id: String, pathToImage: String) {
+        imageView.setImageBitmap(null)
         try {
             resources.assets.open(pathToImage).use { istream ->
                 val bitmap: Bitmap = BitmapFactory.decodeStream(istream)
@@ -76,7 +86,7 @@ class MainPageActivity : AppCompatActivity() {
                 val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
                 val body = MultipartBody.Part.createFormData("file", pathToImage, requestFile); // 第一引数はサーバ側の@RequestParamの名前と一致させる
 
-                imageService.addImage(body)
+                imageService.addImage(id, body)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
@@ -89,24 +99,36 @@ class MainPageActivity : AppCompatActivity() {
             }
         } catch (e: IOException) {
             e.printStackTrace()
-        } finally {
-            println("unknown error")
         }
     }
 
-    private fun getImage(id: Long) {
-        imageService.getImageById(id)
+    private fun getImage(id: String) {
+        imageView.setImageBitmap(null)
+        imageService.getImageUrlById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get image succeeded", Toast.LENGTH_SHORT).show()
-                    println("get image succeeded")
-                    // val blob = it.rawData
-                    // val bitmap = BitmapFactory.decodeByteArray(blob, 0, blob.size)
-                    // imageView.setImageBitmap(bitmap)
+                    Toast.makeText(this, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    println("get image url succeeded: $it")
+
+                    Glide.with(this).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.url).into(imageView);
+                    /*
+                    imageService.getImageByUrl(it.url)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({
+                                // Toast.makeText(this, "get image succeeded: ${it.body()}", Toast.LENGTH_SHORT).show()
+                                // println("get image succeeded: ${it.body()}")
+                                // val bitmap = BitmapFactory.decodeByteArray(it.body(), 0, it.body.size)
+                                // imageView.setImageBitmap(bitmap)
+                            }, {
+                                Toast.makeText(this, "get image failed: $it", Toast.LENGTH_SHORT).show()
+                                println("get image failed: $it")
+                            })
+                    */
                 }, {
-                    Toast.makeText(this, "get image failed: $it", Toast.LENGTH_SHORT).show()
-                    println("get image failed: $it")
+                    Toast.makeText(this, "get image url failed: $it", Toast.LENGTH_SHORT).show()
+                    println("get image url failed: $it")
                 })
     }
 

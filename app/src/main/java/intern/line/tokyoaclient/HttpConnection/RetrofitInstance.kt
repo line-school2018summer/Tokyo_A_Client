@@ -14,6 +14,7 @@ val base_url = "http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com"
 
 val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .setLenient()
         .create()
 val okHttpclient = OkHttpClient.Builder()
         .addNetworkInterceptor(StethoInterceptor())

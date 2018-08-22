@@ -2,24 +2,27 @@ package intern.line.tokyoaclient.HttpConnection.service
 
 import intern.line.tokyoaclient.HttpConnection.model.Image
 import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.http.*
 import rx.Completable
 import rx.Single
 
 
-data class PostImageRequest (
-        val fileName: String,
-        val rawData: ByteArray
+data class GetImageUrlResponse (
+        val url: String
+)
+data class GetImageResponse (
+        var data: ByteArray
 )
 
 interface ImageService {
-    @GET("/image")
-    fun getAllImage(): Single<List<Image>>
+    @GET("/image/id/{id}")
+    fun getImageUrlById(@Path("id") id: String): Single<GetImageUrlResponse>
 
-    @GET("/image/{id}")
-    fun getImageById(@Path("id") id: Long): Single<Image>
+    @GET("/image/url/{url}")
+    fun getImageByUrl(@Path("url") url: String): Single<Response<ByteArray>>
 
     @Multipart
-    @POST("/image/create")
-    fun addImage(@Part file: MultipartBody.Part): Completable
+    @POST("/image/create/{id}")
+    fun addImage(@Path("id") id: String, @Part file: MultipartBody.Part): Completable
 }
