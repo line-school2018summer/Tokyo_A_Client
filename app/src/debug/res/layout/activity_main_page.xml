@@ -31,30 +31,12 @@
         android:hint="talk debug" />
 
     <Button
-        android:id="@+id/postImageButton"
+        android:id="@+id/goToImageDebugButton"
         android:layout_width="80dp"
         android:layout_height="60dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/goToTalkRoomButton"
-        android:hint="post image" />
-
-    <Button
-        android:id="@+id/getImageButton"
-        android:layout_width="80dp"
-        android:layout_height="60dp"
-        android:layout_above="@+id/resultText"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="-179dp"
-        android:hint="get image" />
-
-    <ImageView
-        android:id="@+id/iconImage"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="100dp" />
+        android:hint="image debug" />
 
 </RelativeLayout>
