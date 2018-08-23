@@ -33,22 +33,16 @@ class ImageDebugActivity : AppCompatActivity() {
         imageView = findViewById(R.id.iconImage) as ImageView
         textView = findViewById(R.id.iconText) as TextView
 
-        val postImageButton = findViewById(R.id.postImageButton) as Button
-        postImageButton.setOnClickListener {
-            // importImage("github_logo.png")
-            postImage(userId, "github_logo.png")
-            getImageUrl(userId)
-        }
-
         val getImageButton = findViewById(R.id.getImageButton) as Button
         getImageButton.setOnClickListener {
             getImage(userId)
             getImageUrl(userId)
         }
 
-        val deleteImageButton = findViewById(R.id.deleteImageButton) as Button
-        deleteImageButton.setOnClickListener {
-            deleteImage(userId)
+        val postImageButton = findViewById(R.id.postImageButton) as Button
+        postImageButton.setOnClickListener {
+            // importImage("github_logo.png")
+            postImage(userId, "github_logo.png")
             getImageUrl(userId)
         }
 
@@ -57,42 +51,11 @@ class ImageDebugActivity : AppCompatActivity() {
             putImage(userId, "github_logo.png")
             getImageUrl(userId)
         }
-    }
 
-    private fun importImage(pathToImage: String) {
-        try {resources.assets.open(pathToImage).use { istream ->
-                val bitmap: Bitmap = BitmapFactory.decodeStream(istream)
-                imageView.setImageBitmap(bitmap)
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-
-    private fun postImage(id: String, pathToImage: String) {
-        imageView.setImageBitmap(null)
-        try {
-            resources.assets.open(pathToImage).use { istream ->
-                val bitmap: Bitmap = BitmapFactory.decodeStream(istream)
-                imageView.setImageBitmap(bitmap) // 表示
-
-                val content = bitmapToByteArray(bitmap) // ByteArray
-                val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
-                val body = MultipartBody.Part.createFormData("file", pathToImage, requestFile); // 第一引数はサーバ側の@RequestParamの名前と一致させる
-
-                imageService.addImage(id, body)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe({
-                            Toast.makeText(this, "post image succeeded", Toast.LENGTH_SHORT).show()
-                            println("post image succeeded")
-                        }, {
-                            Toast.makeText(this, "post image failed: $it", Toast.LENGTH_SHORT).show()
-                            println("post image failed: $it")
-                        })
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
+        val deleteImageButton = findViewById(R.id.deleteImageButton) as Button
+        deleteImageButton.setOnClickListener {
+            deleteImage(userId)
+            getImageUrl(userId)
         }
     }
 
@@ -129,20 +92,6 @@ class ImageDebugActivity : AppCompatActivity() {
                         textView.text = "file path: ${it.pathToFile}"
 
                         Glide.with(this).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(imageView);
-                        /* FOLLOWING CODE DOES NOT WORK WELL
-                        imageService.getImageByUrl(it.url)
-                                .subscribeOn(Schedulers.io())
-                                .observeOn(AndroidSchedulers.mainThread())
-                                .subscribe({
-                                // Toast.makeText(this, "get image succeeded: ${it.body()}", Toast.LENGTH_SHORT).show()
-                                // println("get image succeeded: ${it.body()}")
-                                // val bitmap = BitmapFactory.decodeByteArray(it.body(), 0, it.body.size)
-                                // imageView.setImageBitmap(bitmap)
-                                }, {
-                                    Toast.makeText(this, "get image failed: $it", Toast.LENGTH_SHORT).show()
-                                    println("get image failed: $it")
-                                })
-                        */
 
                     } else {
                         Toast.makeText(this, "Image url for id $id not found. Please post image first.", Toast.LENGTH_SHORT).show()
@@ -155,27 +104,31 @@ class ImageDebugActivity : AppCompatActivity() {
                 })
     }
 
-    private fun bitmapToByteArray (bitmap: Bitmap): ByteArray {
-        var byteArrayOutputStream = ByteArrayOutputStream()
-
-        // PNG, クオリティー100としてbyte配列にデータを格納
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
-
-        return byteArrayOutputStream.toByteArray()
-    }
-
-    private fun deleteImage(id: String) {
+    private fun postImage(id: String, pathToImage: String) {
         imageView.setImageBitmap(null)
-        imageService.deleteImage(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    Toast.makeText(this, "delete image url succeeded", Toast.LENGTH_SHORT).show()
-                    println("delete image url succeeded")
-                }, {
-                    Toast.makeText(this, "get image url failed: $it", Toast.LENGTH_SHORT).show()
-                    println("get image url failed: $it")
-                })
+        try {
+            resources.assets.open(pathToImage).use { istream ->
+                val bitmap: Bitmap = BitmapFactory.decodeStream(istream)
+                imageView.setImageBitmap(bitmap) // 表示
+
+                val content = bitmapToByteArray(bitmap) // ByteArray
+                val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), content);
+                val body = MultipartBody.Part.createFormData("file", pathToImage, requestFile); // 第一引数はサーバ側の@RequestParamの名前と一致させる
+
+                imageService.addImage(id, body)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe({
+                            Toast.makeText(this, "post image succeeded", Toast.LENGTH_SHORT).show()
+                            println("post image succeeded")
+                        }, {
+                            Toast.makeText(this, "post image failed: $it", Toast.LENGTH_SHORT).show()
+                            println("post image failed: $it")
+                        })
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
 
     private fun putImage(id: String, pathToImage: String) {
@@ -203,5 +156,38 @@ class ImageDebugActivity : AppCompatActivity() {
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+
+    private fun deleteImage(id: String) {
+        imageView.setImageBitmap(null)
+        imageService.deleteImage(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(this, "delete image url succeeded", Toast.LENGTH_SHORT).show()
+                    println("delete image url succeeded")
+                }, {
+                    Toast.makeText(this, "get image url failed: $it", Toast.LENGTH_SHORT).show()
+                    println("get image url failed: $it")
+                })
+    }
+
+    private fun importImage(pathToImage: String) {
+        try {resources.assets.open(pathToImage).use { istream ->
+                val bitmap: Bitmap = BitmapFactory.decodeStream(istream)
+                imageView.setImageBitmap(bitmap)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun bitmapToByteArray (bitmap: Bitmap): ByteArray {
+        var byteArrayOutputStream = ByteArrayOutputStream()
+
+        // PNG, クオリティー100としてbyte配列にデータを格納
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+
+        return byteArrayOutputStream.toByteArray()
     }
 }
