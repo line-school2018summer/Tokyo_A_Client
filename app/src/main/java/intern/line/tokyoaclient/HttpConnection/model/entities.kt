@@ -18,3 +18,8 @@ data class Talk(
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
+
+data class Friend(
+        var userId: String = "default",
+        var friendId: String = "default"
+)

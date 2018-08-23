@@ -27,3 +27,4 @@ val retrofit = Retrofit.Builder()
 
 val userProfileService: UserProfileService = retrofit.create(UserProfileService::class.java)
 val talkService: TalkService = retrofit.create(TalkService::class.java)
+val friendService: FriendService = retrofit.create(FriendService::class.java)

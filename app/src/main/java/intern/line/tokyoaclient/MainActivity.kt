@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         //ボタンをゲットしておく
         val signUpButton = findViewById(R.id.signup) as Button
         val signInButton = findViewById(R.id.signin) as Button
+        val goButton = findViewById(R.id.goButton) as Button
 
         //それぞれのボタンが押されたときにメソッドを呼び出す
         signUpButton.setOnClickListener {
@@ -42,6 +43,9 @@ class MainActivity : AppCompatActivity() {
         }
         signInButton.setOnClickListener {
             signIn()
+        }
+        goButton.setOnClickListener {
+            goTest()
         }
     }
 
@@ -106,9 +110,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun intent(uid:String) {
-        var intent= Intent(this, MainPageActivity::class.java)
+        var intent= Intent(this, FriendListActivity::class.java)
         intent.putExtra("userId", uid)
         startActivity(intent)
     }
+    private fun goTest() {
+        var intent= Intent(this, FriendListActivity::class.java)
+        //intent.putExtra("userId", uid)
+        startActivity(intent)
+    }
 }
+
 
