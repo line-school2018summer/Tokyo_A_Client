@@ -18,13 +18,13 @@ import rx.schedulers.Schedulers
 class MainActivity : AppCompatActivity() {
     //firabaseauthオブジェクトとログインユーザーオブジェクトのインスタンスを作っておく
     private var mAuth = FirebaseAuth.getInstance()
-    private var currentUser :FirebaseUser? = null
+    private var currentUser: FirebaseUser? = null
 
-    private lateinit var nameStr :String
-    private lateinit var passwordStr :String
-    private lateinit var mailStr :String
+    private lateinit var nameStr: String
+    private lateinit var passwordStr: String
+    private lateinit var mailStr: String
 
-    private lateinit var userId :String
+    private lateinit var userId: String
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun signUp(){
+    private fun signUp() {
         if (nameText.text.toString() == "") {
             nameText.error = "なにか入力してください"
         } else {
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun signIn(){   //signUp()と同様
+    private fun signIn() {   //signUp()と同様
         nameStr = nameText.text.toString()
         passwordStr = passwordText.text.toString()
         mailStr = mailText.text.toString()
@@ -96,26 +96,27 @@ class MainActivity : AppCompatActivity() {
                 }
     }
 
-    private fun createAccount(idStr: String,nameStr:String) {
-            userProfileService.addUser(idStr, nameStr)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe({
-                        Toast.makeText(this, "create succeeded", Toast.LENGTH_LONG).show()
-                        println("create succeeded")
-                    }, {
-                        Toast.makeText(this, "create failed: $it", Toast.LENGTH_LONG).show()
-                        println("create failed: $it")
-                    })
+    private fun createAccount(idStr: String, nameStr: String) {
+        userProfileService.addUser(idStr, nameStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(this, "create succeeded", Toast.LENGTH_LONG).show()
+                    println("create succeeded")
+                }, {
+                    Toast.makeText(this, "create failed: $it", Toast.LENGTH_LONG).show()
+                    println("create failed: $it")
+                })
     }
 
-    private fun intent(uid:String) {
-        var intent= Intent(this, FriendListActivity::class.java)
+    private fun intent(uid: String) {
+        var intent = Intent(this, FriendListActivity::class.java)
         intent.putExtra("userId", uid)
         startActivity(intent)
     }
+
     private fun goTest() {
-        var intent= Intent(this, FriendListActivity::class.java)
+        var intent = Intent(this, AddFriendActivity::class.java)
         //intent.putExtra("userId", uid)
         startActivity(intent)
     }

@@ -7,8 +7,7 @@ import rx.Single
 
 
 interface FriendService {
-    /* --- talk --- */
-    @GET("/talk")
+    @GET("/friend")
     fun getAllFriends(): Single<List<Friend>>
 
     @GET("/friend/{userId}")

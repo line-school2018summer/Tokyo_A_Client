@@ -9,12 +9,14 @@ import rx.android.schedulers.AndroidSchedulers
 import intern.line.tokyoaclient.HttpConnection.model.Friend
 import intern.line.tokyoaclient.HttpConnection.friendService
 import rx.schedulers.Schedulers
+import android.widget.ArrayAdapter
 
 
 class FriendListActivity : AppCompatActivity() {
 
     private lateinit var friendList: ListView
-    private lateinit var adapter: ArrayAdapter<List<Friend>>
+    private lateinit var addFriendButton: Button
+    private var adapter: ArrayAdapter<Friend>? = null
 
     private lateinit var userId: String
 
@@ -23,42 +25,53 @@ class FriendListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_friend_list)
 
         userId = intent.getStringExtra("userId")
+        addFriendButton = findViewById(R.id.addFriendButton) as Button
+        friendList = (findViewById(R.id.friendList)) as ListView
 
-        friendList = (findViewById(R.id.friendListview)) as ListView
 
         getName(userId)
         getFriend(userId)
 
+        addFriendButton.setOnClickListener {
+            goToAddFriend(userId)
+        }
+
 
     }
 
-    private fun getFriend(uid: String){
-        friendService.getFriendById(uid)
+    private fun getFriend(userId: String) {
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, ArrayList<Friend>())
+        friendService.getFriendById(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    adapter.add(it)
-                    friendList.setAdapter(adapter)
-                    Toast.makeText(this, "get id succeeded", Toast.LENGTH_LONG).show()
+                    adapter?.addAll(it)
+                    Toast.makeText(this, "get id succeeded", Toast.LENGTH_SHORT).show()
                     println("get friend list succeeded: $it")
                 }, {
                     Toast.makeText(this, "get id failed: $it", Toast.LENGTH_LONG).show()
                     println("get friend list failed: $it")
                 })
+        friendList.setAdapter(adapter)
     }
 
-    private fun getName(idStr:String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    private fun getName(idStr: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
         userProfileService.getUserById(idStr)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get id succeeded", Toast.LENGTH_SHORT).show()
-                    println("get id succeeded: $it")
-                    (findViewById(R.id.ownNameText) as TextView).text =it.name
+                    Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    println("get name succeeded: $it")
+                    (findViewById(R.id.ownNameText) as TextView).text = it.name
                 }, {
-                    Toast.makeText(this, "get id failed: $it", Toast.LENGTH_LONG).show()
-                    println("get id failed: $it")
+                    Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
+                    println("get name failed: $it")
                 })
     }
-}
 
+    private fun goToAddFriend(userId: String) {
+        var intent = Intent(this, AddFriendActivity::class.java)
+        intent.putExtra("userId", userId)
+        startActivity(intent)
+    }
+}

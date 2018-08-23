@@ -93,7 +93,7 @@ class TalkActivity : AppCompatActivity() {
                     Toast.makeText(this, "get talk succeeded", Toast.LENGTH_SHORT).show()
                     println("get talk succeeded: $it")
 
-                    if(!it.isEmpty()) {
+                    if (!it.isEmpty()) {
                         println("it[0].talkId: ${it[0].talkId}")
                         sinceTalkId = it.last().talkId
                         adapter.addAll(it.map { talk -> talk.text })
