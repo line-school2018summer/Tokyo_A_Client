@@ -9,6 +9,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import android.widget.Toast
 import android.widget.ArrayAdapter
+import android.widget.TextView
 
 
 class AddFriendActivity : AppCompatActivity() {
@@ -32,6 +33,12 @@ class AddFriendActivity : AppCompatActivity() {
         searchFriendButton.setOnClickListener {
             searchFriend()
         }
+        searchFriendResultList.setOnItemClickListener { adapterView, view, position, id ->
+            val itemTextView: TextView = view.findViewById(android.R.id.text1)
+            val msg = itemTextView.text.toString()
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     private fun searchFriend() {
