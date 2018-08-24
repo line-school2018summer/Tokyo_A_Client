@@ -26,6 +26,11 @@ class MainPageActivity : AppCompatActivity() {
             // goToTalkRoom(roomId)
             goToTalkRoom(0) // for test
         }
+
+        val goToImageDebugButton = findViewById(R.id.goToImageDebugButton) as Button
+        goToImageDebugButton.setOnClickListener {
+            goToImageDebugMode()
+        }
     }
 
     fun getName(idStr:String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
@@ -46,10 +51,20 @@ class MainPageActivity : AppCompatActivity() {
         intent(userId, roomId)
     }
 
+    private fun goToImageDebugMode() {
+        intentImage(userId)
+    }
+
     private fun intent(userId: String, roomId: Long) {
         var intent= Intent(this, TalkActivity::class.java)
         intent.putExtra("userId", userId)
         intent.putExtra("roomId", roomId.toString())
+        startActivity(intent)
+    }
+
+    private fun intentImage(userId: String) {
+        var intent = Intent(this, ImageDebugActivity::class.java)
+        intent.putExtra("userId", userId)
         startActivity(intent)
     }
 }

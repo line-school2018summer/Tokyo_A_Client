@@ -14,6 +14,7 @@ val base_url = "http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com"
 
 val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .setLenient()
         .create()
 val okHttpclient = OkHttpClient.Builder()
         .addNetworkInterceptor(StethoInterceptor())
@@ -27,3 +28,4 @@ val retrofit = Retrofit.Builder()
 
 val userProfileService: UserProfileService = retrofit.create(UserProfileService::class.java)
 val talkService: TalkService = retrofit.create(TalkService::class.java)
+val imageService: ImageService = retrofit.create(ImageService::class.java)

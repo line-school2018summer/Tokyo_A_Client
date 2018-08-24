@@ -30,4 +30,13 @@
         android:layout_height="60dp"
         android:hint="talk debug" />
 
+    <Button
+        android:id="@+id/goToImageDebugButton"
+        android:layout_width="80dp"
+        android:layout_height="60dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/goToTalkRoomButton"
+        android:hint="image debug" />
+
 </RelativeLayout>
