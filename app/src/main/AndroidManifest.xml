@@ -20,6 +20,7 @@
         <activity android:name=".DebugActivity" />
         <activity android:name=".MainPageActivity" />
         <activity android:name=".TalkActivity" />
+        <activity android:name=".ImageDebugActivity" />
         <activity android:name=".FriendListActivity" />
         <activity android:name=".AddFriendActivity" />
     </application>

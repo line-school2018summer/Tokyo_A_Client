@@ -25,3 +25,10 @@ data class Friend(
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
+
+data class ImageUrl(
+        var uid: String,
+        var pathToFile: String,
+        var createdAt: Timestamp,
+        var updatedAt: Timestamp
+)
