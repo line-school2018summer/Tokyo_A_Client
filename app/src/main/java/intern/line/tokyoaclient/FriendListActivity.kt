@@ -6,17 +6,16 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.*
 import rx.android.schedulers.AndroidSchedulers
-import intern.line.tokyoaclient.HttpConnection.model.Friend
 import intern.line.tokyoaclient.HttpConnection.friendService
 import rx.schedulers.Schedulers
-import android.widget.ArrayAdapter
+import java.util.UUID
 
 
 class FriendListActivity : AppCompatActivity() {
 
     private lateinit var friendList: ListView
     private lateinit var addFriendButton: Button
-    private var adapter: ArrayAdapter<Friend>? = null
+    private var adapter: UserListAdapter? = null
 
     private lateinit var userId: String
 
@@ -26,43 +25,64 @@ class FriendListActivity : AppCompatActivity() {
 
         userId = intent.getStringExtra("userId")
         addFriendButton = findViewById(R.id.addFriendButton) as Button
-        friendList = (findViewById(R.id.friendList)) as ListView
+        friendList = findViewById(R.id.friendList) as ListView
 
+        adapter = UserListAdapter(this, ArrayList())
+        friendList.setAdapter(adapter)
 
-        getName(userId)
+        getOwnName(userId)
         getFriend(userId)
 
         addFriendButton.setOnClickListener {
             goToAddFriend(userId)
         }
-
-
+        friendList.setOnItemClickListener { adapterView, view, position, id ->
+            val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
+            val num1: Int = Math.abs(UUID.nameUUIDFromBytes("test".toByteArray()).hashCode())
+            val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
+            val roomId: Int = num1+num2
+            //goToTalk(roomId)
+        }
     }
 
     private fun getFriend(userId: String) {
-        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, ArrayList<Friend>())
         friendService.getFriendById(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    adapter?.addAll(it)
+                    for (s in it) {
+                        getFriendName(s.friendId)
+                    }
                     Toast.makeText(this, "get id succeeded", Toast.LENGTH_SHORT).show()
                     println("get friend list succeeded: $it")
                 }, {
                     Toast.makeText(this, "get id failed: $it", Toast.LENGTH_LONG).show()
                     println("get friend list failed: $it")
                 })
-        friendList.setAdapter(adapter)
     }
 
-    private fun getName(idStr: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    private fun getOwnName(idStr: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
         userProfileService.getUserById(idStr)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
-                    (findViewById(R.id.ownNameText) as TextView).text = it.name
+                    (findViewById(R.id.ownNameText) as TextView).text = "Hello, ${it.name}!"
+                }, {
+                    Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
+                    println("get name failed: $it")
+                })
+    }
+
+    private fun getFriendName(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+        userProfileService.getUserById(friendId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    println("get name succeeded: $it")
+                    adapter?.addAll(it)
                 }, {
                     Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
@@ -70,8 +90,15 @@ class FriendListActivity : AppCompatActivity() {
     }
 
     private fun goToAddFriend(userId: String) {
-        var intent = Intent(this, AddFriendActivity::class.java)
+        val intent = Intent(this, AddFriendActivity::class.java)
         intent.putExtra("userId", userId)
+        startActivity(intent)
+    }
+
+    private fun goToTalk(roomId: Int) {
+        val intent = Intent(this, TalkActivity::class.java)
+        intent.putExtra("userId", userId)
+        intent.putExtra("roomId", roomId.toString())
         startActivity(intent)
     }
 }

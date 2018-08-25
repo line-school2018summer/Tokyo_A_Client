@@ -90,7 +90,7 @@ class TalkActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get talk succeeded", Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(this, "get talk succeeded", Toast.LENGTH_SHORT).show()
                     println("get talk succeeded: $it")
 
                     if (!it.isEmpty()) {

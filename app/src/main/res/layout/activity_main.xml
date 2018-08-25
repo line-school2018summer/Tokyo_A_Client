@@ -97,7 +97,7 @@
         android:layout_marginEnd="296dp"
         android:layout_marginRight="296dp"
         android:layout_marginTop="265dp"
-        android:text="Go"
+        android:text="debug"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
