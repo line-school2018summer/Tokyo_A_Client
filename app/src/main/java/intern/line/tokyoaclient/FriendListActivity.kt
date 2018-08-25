@@ -38,10 +38,10 @@ class FriendListActivity : AppCompatActivity() {
         }
         friendList.setOnItemClickListener { adapterView, view, position, id ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
-            val num1: Int = Math.abs(UUID.nameUUIDFromBytes("test".toByteArray()).hashCode())
+            val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
             val roomId: Int = num1+num2
-            //goToTalk(roomId)
+            goToTalk(roomId)
         }
     }
 
@@ -53,10 +53,10 @@ class FriendListActivity : AppCompatActivity() {
                     for (s in it) {
                         getFriendName(s.friendId)
                     }
-                    Toast.makeText(this, "get id succeeded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "get friend list succeeded", Toast.LENGTH_SHORT).show()
                     println("get friend list succeeded: $it")
                 }, {
-                    Toast.makeText(this, "get id failed: $it", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "get friend list failed: $it", Toast.LENGTH_LONG).show()
                     println("get friend list failed: $it")
                 })
     }
