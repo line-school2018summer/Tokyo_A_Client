@@ -19,6 +19,13 @@ data class Talk(
         var updatedAt: Timestamp = Timestamp(0L)
 )
 
+data class Friend(
+        var userId: String = "",
+        var friendId: String = "",
+        var createdAt: Timestamp = Timestamp(0L),
+        var updatedAt: Timestamp = Timestamp(0L)
+)
+
 data class ImageUrl(
         var uid: String,
         var pathToFile: String,
