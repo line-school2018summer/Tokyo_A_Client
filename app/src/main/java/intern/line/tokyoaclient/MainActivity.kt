@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var nameStr: String
     private lateinit var passwordStr: String
     private lateinit var mailStr: String
-
     private lateinit var userId: String
 
 
@@ -37,6 +36,14 @@ class MainActivity : AppCompatActivity() {
         val signInButton = findViewById(R.id.signin) as Button
         val goButton = findViewById(R.id.goButton) as Button
 
+
+
+        val iconsetting = findViewById(R.id.iconsetting) as Button
+
+
+
+
+
         //それぞれのボタンが押されたときにメソッドを呼び出す
         signUpButton.setOnClickListener {
             signUp()
@@ -47,6 +54,14 @@ class MainActivity : AppCompatActivity() {
         goButton.setOnClickListener {
             goTest()
         }
+
+
+
+        iconsetting.setOnClickListener {
+            goIconSetting()
+        }
+
+
     }
 
 
@@ -118,6 +133,11 @@ class MainActivity : AppCompatActivity() {
     private fun goTest() {
         var intent = Intent(this, AddFriendActivity::class.java)
         //intent.putExtra("userId", uid)
+        startActivity(intent)
+    }
+
+    private fun goIconSetting(){
+        var intent = Intent(this, changeiconActivity::class.java)
         startActivity(intent)
     }
 }
