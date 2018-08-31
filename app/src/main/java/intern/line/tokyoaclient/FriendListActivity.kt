@@ -46,6 +46,7 @@ class FriendListActivity : AppCompatActivity() {
     }
 
     private fun getFriend(userId: String) {
+        adapter?.clear()
         friendService.getFriendById(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

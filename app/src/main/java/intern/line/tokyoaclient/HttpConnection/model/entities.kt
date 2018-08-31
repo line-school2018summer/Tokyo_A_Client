@@ -32,3 +32,11 @@ data class ImageUrl(
         var createdAt: Timestamp,
         var updatedAt: Timestamp
 )
+
+data class Room{
+
+}
+
+data class RoomMember{
+
+}
