@@ -27,5 +27,4 @@ interface UserProfileService {
 
     @DELETE("/user/delete/{id}")
     fun deleteUser(@Path("id") id: String): Single<UserProfile>
-
 }

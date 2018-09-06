@@ -30,3 +30,4 @@ val userProfileService: UserProfileService = retrofit.create(UserProfileService:
 val talkService: TalkService = retrofit.create(TalkService::class.java)
 val imageService: ImageService = retrofit.create(ImageService::class.java)
 val friendService: FriendService = retrofit.create(FriendService::class.java)
+val roomService: RoomService = retrofit.create(RoomService::class.java)
