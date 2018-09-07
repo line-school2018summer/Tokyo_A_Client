@@ -1,5 +1,4 @@
 package intern.line.tokyoaclient
-
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
@@ -33,7 +32,6 @@ class changeiconActivity : AppCompatActivity(), View.OnClickListener {
                 getPicFromLocal()
             R.id.buttonCamera ->
                 getPicFromCamera()
-
             else -> {
             }
         }
@@ -46,7 +44,6 @@ class changeiconActivity : AppCompatActivity(), View.OnClickListener {
         startActivityForResult(intent, CODE_PHOTO_REQUEST)
     }
 
-
     private fun getPicFromCamera() {
         val intent = Intent()
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE
@@ -54,7 +51,6 @@ class changeiconActivity : AppCompatActivity(), View.OnClickListener {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(USER_ICON))
         startActivityForResult(intent, CODE_CAMERA_REQUEST)
     }
-
 
     private fun photoClip(uri: Uri?) {
         // 调用系统中自带的图片剪裁
