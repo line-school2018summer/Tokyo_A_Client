@@ -32,3 +32,17 @@ data class ImageUrl(
         var createdAt: Timestamp,
         var updatedAt: Timestamp
 )
+
+data class Room(
+        var roomId: Long = -1,
+        var roomName: String = "default",
+        var createdAt: Timestamp = Timestamp(0L),
+        var updatedAt: Timestamp = Timestamp(0L)
+)
+
+data class RoomMember(
+        var roomId: Long = -1,
+        var uid: String = "",
+        var createdAt: Timestamp = Timestamp(0L),
+        var updatedAt: Timestamp = Timestamp(0L)
+)

@@ -1,33 +1,46 @@
 package intern.line.tokyoaclient
 
+
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import android.widget.*
-import intern.line.tokyoaclient.HttpConnection.*
-import rx.android.schedulers.AndroidSchedulers
+import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
 import intern.line.tokyoaclient.HttpConnection.friendService
+import intern.line.tokyoaclient.HttpConnection.userProfileService
+import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
-import java.util.UUID
+import java.util.*
 
 
-class FriendListActivity : AppCompatActivity() {
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+// private const val ARG_PARAM1 = "param1"
 
-    private lateinit var friendList: ListView
-    private lateinit var addFriendButton: Button
-    private var adapter: UserListAdapter? = null
+private lateinit var friendList: ListView
+private lateinit var addFriendButton: Button
+private var adapter: UserListAdapter? = null
 
-    private lateinit var userId: String
+private lateinit var userId: String
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_friend_list)
+class FriendListFragment : Fragment() {
+    private lateinit var v: View
 
-        userId = intent.getStringExtra("userId")
-        addFriendButton = findViewById(R.id.addFriendButton) as Button
-        friendList = findViewById(R.id.friendList) as ListView
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
+                              savedInstanceState: Bundle?): View? {
+        // Inflate the layout for this fragment
+        v = inflater.inflate(R.layout.fragment_friend_list, container, false)
+        //MyPagerAdapterで設定しておいたargumentsを取得
+        userId = arguments!!.getString("userId")
+        addFriendButton = v.findViewById(R.id.addFriendButton) as Button
+        friendList = v.findViewById(R.id.friendList) as ListView
 
-        adapter = UserListAdapter(this, ArrayList())
+        adapter = UserListAdapter(context!!, ArrayList())
         friendList.setAdapter(adapter)
 
         getOwnName(userId)
@@ -40,9 +53,10 @@ class FriendListActivity : AppCompatActivity() {
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
-            val roomId: Int = num1+num2
+            val roomId: Int = num1 + num2
             goToTalk(roomId)
         }
+        return v
     }
 
     private fun getFriend(userId: String) {
@@ -54,10 +68,10 @@ class FriendListActivity : AppCompatActivity() {
                     for (s in it) {
                         getFriendName(s.friendId)
                     }
-                    Toast.makeText(this, "get friend list succeeded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "get friend list succeeded", Toast.LENGTH_SHORT).show()
                     println("get friend list succeeded: $it")
                 }, {
-                    Toast.makeText(this, "get friend list failed: $it", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "get friend list failed: $it", Toast.LENGTH_LONG).show()
                     println("get friend list failed: $it")
                 })
     }
@@ -67,11 +81,11 @@ class FriendListActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
-                    (findViewById(R.id.ownNameText) as TextView).text = "Hello, ${it.name}!"
+                    (v.findViewById(R.id.ownNameText) as TextView).text = "Hello, ${it.name}!"
                 }, {
-                    Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
                 })
     }
@@ -81,25 +95,26 @@ class FriendListActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
                     adapter?.addAll(it)
                 }, {
-                    Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
                 })
     }
 
     private fun goToAddFriend(userId: String) {
-        val intent = Intent(this, AddFriendActivity::class.java)
+        val intent = Intent(context, AddFriendActivity::class.java)
         intent.putExtra("userId", userId)
         startActivity(intent)
     }
 
     private fun goToTalk(roomId: Int) {
-        val intent = Intent(this, TalkActivity::class.java)
+        val intent = Intent(context, TalkActivity::class.java)
         intent.putExtra("userId", userId)
         intent.putExtra("roomId", roomId.toString())
         startActivity(intent)
     }
+
 }
