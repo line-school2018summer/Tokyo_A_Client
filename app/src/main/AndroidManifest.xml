@@ -23,6 +23,7 @@
         <activity android:name=".ImageDebugActivity" />
         <activity android:name=".FriendListActivity" />
         <activity android:name=".AddFriendActivity" />
+        <activity android:name=".localDBDebugActivity" />
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
 
