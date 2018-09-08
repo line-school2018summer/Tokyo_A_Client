@@ -3,7 +3,6 @@ package intern.line.tokyoaclient
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.View
 import android.widget.*
 import com.facebook.stetho.Stetho
 import com.google.android.gms.tasks.Task
@@ -32,12 +31,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         Stetho.initializeWithDefaults(this)
         setContentView(R.layout.activity_main)
-
-        // （一番下の）ナビゲーションバーを隠す
-        var decor: View = this.window.decorView
-        decor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY)
 
         //ボタンをゲットしておく
         val signUpButton = findViewById(R.id.signup) as Button
