@@ -111,13 +111,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun intent(uid: String) {
-        var intent = Intent(this, FriendListActivity::class.java)
+        var intent = Intent(this, TabLayoutActivity::class.java)
         intent.putExtra("userId", uid)
         startActivity(intent)
     }
 
     private fun goTest() {
-        var intent = Intent(this, AddFriendActivity::class.java)
+        var intent = Intent(this, TabLayoutActivity::class.java)
         //intent.putExtra("userId", uid)
         startActivity(intent)
     }
