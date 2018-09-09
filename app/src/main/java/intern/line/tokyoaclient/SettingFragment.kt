@@ -69,4 +69,9 @@ class SettingFragment : Fragment() {
         intent.putExtra("userName", userName)
         startActivity(intent)
     }
+
+    override fun onResume() {
+        super.onResume()
+        getOwnName(userId)
+    }
 }

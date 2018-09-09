@@ -34,7 +34,7 @@ class EditNameActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Toast.makeText(this, "modify name succeeded", Toast.LENGTH_SHORT).show()
-                    // finish()
+                    finish()
                 }, {
                     Toast.makeText(this, "modify name failed: $it", Toast.LENGTH_LONG).show()
                     println("modify name failed: $it")
