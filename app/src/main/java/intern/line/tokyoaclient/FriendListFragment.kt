@@ -2,6 +2,8 @@ package intern.line.tokyoaclient
 
 
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -12,7 +14,9 @@ import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
 import intern.line.tokyoaclient.HttpConnection.friendService
+import intern.line.tokyoaclient.HttpConnection.model.UserProfile
 import intern.line.tokyoaclient.HttpConnection.userProfileService
+import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
@@ -30,6 +34,9 @@ private lateinit var userId: String
 
 class FriendListFragment : Fragment() {
     private lateinit var v: View
+    // localDB
+    private lateinit var fdb: SQLiteDatabase
+    private lateinit var helper: FriendDBHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -43,8 +50,26 @@ class FriendListFragment : Fragment() {
         adapter = UserListAdapter(context!!, ArrayList())
         friendList.setAdapter(adapter)
 
+        try {
+            helper = FriendDBHelper(context)
+        } catch(e: SQLiteException) {
+            Toast.makeText(context, "helper error: ${e.toString()}", Toast.LENGTH_SHORT).show()
+            println("helper error: ${e.toString()}")
+        }
+
+
+        try {
+            // fdb = helper.writableDatabase
+            fdb = helper.readableDatabase
+            Toast.makeText(context, "accessed to database", Toast.LENGTH_SHORT).show()
+        } catch(e: SQLiteException) {
+            Toast.makeText(context, "writable error: ${e.toString()}", Toast.LENGTH_SHORT).show()
+            println("writable error: ${e.toString()}")
+        }
+
         getOwnName(userId)
-        getFriend(userId)
+        // getFriend(userId)
+        getFriendByLocalDB()
 
         addFriendButton.setOnClickListener {
             goToAddFriend(userId)
@@ -76,6 +101,17 @@ class FriendListFragment : Fragment() {
                 })
     }
 
+    private fun getFriendByLocalDB() {
+        adapter?.clear() // 空にする
+        val sqlstr = "select * from friends"
+        val cursor = fdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        while (cursor.moveToNext()) {
+            getFriendNameByLocalDB(cursor.getString(0))
+        }
+        adapter?.notifyDataSetChanged()
+    }
+
     private fun getOwnName(idStr: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
         userProfileService.getUserById(idStr)
                 .subscribeOn(Schedulers.io())
@@ -102,6 +138,18 @@ class FriendListFragment : Fragment() {
                     Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
                 })
+    }
+
+    private fun getFriendNameByLocalDB(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+        val sqlstr = "select * from friend_name where id = '$friendId'"
+        val cursor = fdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        while (cursor.moveToNext()) {
+            adapter?.add(UserProfile(
+                    id = cursor.getString(0), // id
+                    name = cursor.getString(1) // name
+            )) // created_atとupdated_atはdefault値．今後created_atとupdated_atが重要になってきたら変更しないといけない
+        }
     }
 
     private fun goToAddFriend(userId: String) {

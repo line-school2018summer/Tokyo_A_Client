@@ -40,7 +40,6 @@ class localDBDebugActivity : AppCompatActivity() {
             Toast.makeText(this, "accessed to database", Toast.LENGTH_SHORT).show()
         } catch(e: SQLiteException) {
             Toast.makeText(this, "writable error: ${e.toString()}", Toast.LENGTH_SHORT).show()
-            return
         }
 
         val getImageButton = findViewById(R.id.getImageButton) as Button
