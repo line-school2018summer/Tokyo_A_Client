@@ -25,7 +25,8 @@
         <activity android:name=".ImageDebugActivity" />
         <activity android:name=".FriendListActivity" />
         <activity android:name=".AddFriendActivity" />
-        <activity android:name=".TabLayoutActivity"></activity>
+        <activity android:name=".TabLayoutActivity" />
+        <activity android:name=".EditNameActivity" />
     </application>
 
 </manifest>
