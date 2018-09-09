@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.widget.Toast
 
 
-class TalkDBHelper(var context: Context?) : SQLiteOpenHelper(context, "talk_info.db", null, 2) { // 自分の環境でversionを2に上げて実行してしまったら下げられなくなりました．本来なら1から始めるべき．
+class TalkDBHelper(var context: Context?) : SQLiteOpenHelper(context, "talk_info.db", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         //データベースがないときに実行される
         db?.execSQL("create table talks ( " +
