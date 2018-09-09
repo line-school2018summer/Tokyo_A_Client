@@ -37,7 +37,6 @@ class FriendDBHelper(var context: Context?) : SQLiteOpenHelper(context, "friend_
         // 初期およびフレンド追加時以外は変化しないはず？
         db?.execSQL("create table friends ( " +
                 "friend_id text not null " +
-                "friend_name text not null " +
                 ");")
         // フレンド名
         // フレンドがユーザ名を変更した時に差分が出てしまう
@@ -52,6 +51,7 @@ class FriendDBHelper(var context: Context?) : SQLiteOpenHelper(context, "friend_
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
         //バージョンアップしたときに実行される
         //テーブルのdeleteなどを行う
+        // TODO: バージョンアップ時の挙動
         db?.execSQL("drop table if exists friend_name")
         onCreate(db)
         Toast.makeText(context, "table updated", Toast.LENGTH_SHORT).show()
