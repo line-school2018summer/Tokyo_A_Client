@@ -6,9 +6,46 @@
     tools:context=".SettingFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <!-- <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:text="@string/hello_blank_fragment" /> -->
+
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="名前"
+            android:textSize="30sp"
+            android:id="@+id/name"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:layout_width="220dp"
+            android:layout_height="wrap_content"
+            android:text="名前"
+            android:textSize="30sp"
+            android:id="@+id/userName"
+            android:gravity="right"
+            app:layout_constraintStart_toEndOf="@+id/name"
+            app:layout_constraintEnd_toStartOf="@+id/editNameButton" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="編集"
+            android:textSize="20sp"
+            android:id="@+id/editNameButton"
+            app:layout_constraintEnd_toEndOf="parent
+" />
+
+    </android.support.constraint.ConstraintLayout>>
 
 </FrameLayout>
