@@ -3,6 +3,7 @@ package intern.line.tokyoaclient
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ListView
@@ -23,11 +24,12 @@ class TalkActivity : AppCompatActivity() {
     private var sinceTalkId: Long = -1
     private lateinit var talkList: ListView
     private lateinit var adapter: ArrayAdapter<String>
-
+    private lateinit var timer: TimerTask
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_talk_page)
+
         talkList = (findViewById(R.id.talkList) as ListView)
         var data: ArrayList<String> = ArrayList<String>()
         adapter = ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, data)
@@ -47,9 +49,17 @@ class TalkActivity : AppCompatActivity() {
             getAllMessages()
         }
 
-        Timer().schedule(0, 1000, { getMessage() })
+        timer = Timer().schedule(0, 1000, { getMessage() })
     }
 
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 戻るボタンが押されたときの処理
+            timer.cancel()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
 
     private fun sendMessage() {
         if (inputText.text.toString() == "") {

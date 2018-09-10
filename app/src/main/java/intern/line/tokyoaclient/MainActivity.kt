@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Stetho.initializeWithDefaults(this);
+        Stetho.initializeWithDefaults(this)
         setContentView(R.layout.activity_main)
 
         //ボタンをゲットしておく
