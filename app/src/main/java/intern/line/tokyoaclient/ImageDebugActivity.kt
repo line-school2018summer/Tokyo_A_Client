@@ -91,7 +91,7 @@ class ImageDebugActivity : AppCompatActivity() {
                         println("get image url succeeded: $it")
                         textView.text = "file path: ${it.pathToFile}"
 
-                        Glide.with(this).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(imageView);
+                        Glide.with(this).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(imageView)
 
                     } else {
                         Toast.makeText(this, "Image url for id $id not found. Please post image first.", Toast.LENGTH_SHORT).show()

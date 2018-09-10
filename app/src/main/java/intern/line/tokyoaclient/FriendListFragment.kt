@@ -7,12 +7,13 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import com.bumptech.glide.Glide
 import intern.line.tokyoaclient.HttpConnection.friendService
+import intern.line.tokyoaclient.HttpConnection.imageService
+import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.HttpConnection.userProfileService
+import kotlinx.android.synthetic.main.fragment_setting.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
@@ -24,7 +25,9 @@ import java.util.*
 
 private lateinit var friendList: ListView
 private lateinit var addFriendButton: Button
-private var adapter: UserListAdapter? = null
+private lateinit var userIconImageView: ImageView
+// private var adapter: UserListAdapter? = null
+private var adapter: UserListAdapterWithImage? = null
 
 private lateinit var userId: String
 
@@ -39,8 +42,10 @@ class FriendListFragment : Fragment() {
         userId = arguments!!.getString("userId")
         addFriendButton = v.findViewById(R.id.addFriendButton) as Button
         friendList = v.findViewById(R.id.friendList) as ListView
+        userIconImageView = v.findViewById(R.id.icon) as ImageView
 
-        adapter = UserListAdapter(context!!, ArrayList())
+        // adapter = UserListAdapter(context!!, ArrayList())
+        adapter = UserListAdapterWithImage(context!!, ArrayList())
         friendList.setAdapter(adapter)
 
         getOwnName(userId)
@@ -83,10 +88,29 @@ class FriendListFragment : Fragment() {
                 .subscribe({
                     Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
-                    (v.findViewById(R.id.ownNameText) as TextView).text = "Hello, ${it.name}!"
+                    (v.findViewById(R.id.ownNameText) as TextView).text = it.name
+                    getOwnIcon(idStr)
                 }, {
                     Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
+                })
+    }
+
+    private fun getOwnIcon(idStr: String) {
+        imageService.getImageUrlById(idStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    println("get image url succeeded: $it")
+                    if(it.pathToFile != "") {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(userIconImageView)
+                    } else {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(userIconImageView)
+                    }
+                }, {
+                    Toast.makeText(context, "get image url failed: $it", Toast.LENGTH_LONG).show()
+                    println("get image url failed: $it")
                 })
     }
 
@@ -97,10 +121,30 @@ class FriendListFragment : Fragment() {
                 .subscribe({
                     Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
-                    adapter?.addAll(it)
+                    // adapter?.addAll(it)
+                    getIcon(it.id, it.name)
                 }, {
                     Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
+                })
+    }
+
+    private fun getIcon(idStr: String, nameStr: String) {
+        imageService.getImageUrlById(idStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    println("get image url succeeded: $it")
+                    if(it.pathToFile != "") {
+                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
+                    } else {
+                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                    }
+                }, {
+                    adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                    Toast.makeText(context, "get image url failed: $it", Toast.LENGTH_LONG).show()
+                    println("get image url failed: $it")
                 })
     }
 

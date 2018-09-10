@@ -46,3 +46,9 @@ data class RoomMember(
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
+
+data class UserProfileWithImageUrl(
+        var id: String = "default",
+        var name: String = "unknown",
+        var pathToFile: String = "default.jpg"
+)
