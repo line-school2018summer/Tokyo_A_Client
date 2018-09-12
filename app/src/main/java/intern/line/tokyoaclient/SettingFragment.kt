@@ -8,8 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import com.bumptech.glide.Glide
+import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -21,6 +24,7 @@ private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
 private lateinit var editNameButton: Button
+private lateinit var editIcon: ImageView
 private lateinit var userId: String
 
 /**
@@ -42,7 +46,13 @@ class SettingFragment : Fragment() {
 
         editNameButton = v.findViewById(R.id.editNameButton) as Button
         editNameButton.setOnClickListener {
-            goEdit()
+            goNameEdit()
+        }
+
+        editIcon = v.findViewById(R.id.editIcon) as ImageView
+        getIcon(userId)
+        editIcon.setOnClickListener {
+            goIconEdit()
         }
 
         return v
@@ -63,8 +73,35 @@ class SettingFragment : Fragment() {
                 })
     }
 
-    private fun goEdit(){
+    private fun goNameEdit() {
         var intent = Intent(context, EditNameActivity::class.java)
+        intent.putExtra("userId", userId)
+        intent.putExtra("userName", userName)
+        startActivity(intent)
+    }
+
+
+    private fun getIcon(idStr: String) {
+        imageService.getImageUrlById(idStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    // Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    println("get image url succeeded: $it")
+                    if(it.pathToFile != "") {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(editIcon)
+                    } else {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(editIcon)
+                    }
+                }, {
+                    Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(editIcon)
+                    // Toast.makeText(context, "get image url failed: $it", Toast.LENGTH_LONG).show()
+                    println("get image url failed: $it")
+                })
+    }
+
+    private fun goIconEdit() {
+        var intent = Intent(context, EditIconActivity::class.java)
         intent.putExtra("userId", userId)
         intent.putExtra("userName", userName)
         startActivity(intent)
@@ -73,5 +110,6 @@ class SettingFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         getOwnName(userId)
+        getIcon(userId)
     }
 }

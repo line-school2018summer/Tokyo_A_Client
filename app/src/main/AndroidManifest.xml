@@ -27,6 +27,7 @@
         <activity android:name=".AddFriendActivity" />
         <activity android:name=".TabLayoutActivity" />
         <activity android:name=".EditNameActivity" />
+        <activity android:name=".EditIconActivity" />
     </application>
 
 </manifest>

@@ -43,8 +43,28 @@
             android:text="編集"
             android:textSize="20sp"
             android:id="@+id/editNameButton"
-            app:layout_constraintEnd_toEndOf="parent
-" />
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="30dp"
+            android:id="@+id/editIcon"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/userName" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="編集するには画像をタッチ"
+            android:textSize="12sp"
+            android:id="@+id/editIconInstruction"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editIcon" />
 
     </android.support.constraint.ConstraintLayout>>
 
