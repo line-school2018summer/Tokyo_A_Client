@@ -32,6 +32,7 @@ class TalkActivity : AppCompatActivity() {
     private var adapter: TalkAdapter? = null
     private lateinit var timer: TimerTask
     private lateinit var data: ArrayList<TalkWithImageUrl>
+    private var alive = true
 
     // キーボード表示を制御するためのオブジェクト
     private lateinit var inputMethodManager: InputMethodManager
@@ -66,7 +67,8 @@ class TalkActivity : AppCompatActivity() {
             focusOnBackground()
         }
 
-        timer = Timer().schedule(0, 1000, { getMessage() })
+        // timer = Timer().schedule(0, 1000, { getMessage() })
+        getMessageWithLongPolling()
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -77,7 +79,8 @@ class TalkActivity : AppCompatActivity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             // 戻るボタンが押されたときの処理
-            timer.cancel()
+            // timer.cancel()
+            alive = false
         }
         return super.onKeyDown(keyCode, event)
     }
@@ -101,7 +104,7 @@ class TalkActivity : AppCompatActivity() {
                     .subscribe({
                         // Toast.makeText(this, "send talk succeeded", Toast.LENGTH_SHORT).show()
                         println("send talk succeeded: $input")
-                        getMessage()
+                        // getMessage()
                         inputText.editableText.clear() // 入力内容をリセットする
                         adapter?.notifyDataSetChanged()
                         // talkList.setSelection(adapter!!.count)
@@ -146,6 +149,33 @@ class TalkActivity : AppCompatActivity() {
                 }, {
                     Toast.makeText(this, "get talk failed: $it", Toast.LENGTH_SHORT).show()
                     println("get talk failed: $it")
+                })
+    }
+
+    private fun getMessageWithLongPolling() {
+        talkService.getTalk(roomId, sinceTalkId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    //Toast.makeText(this, "get talk succeeded", Toast.LENGTH_SHORT).show()
+                    println("get talk succeeded: $it")
+
+                    if (!it.isEmpty()) {
+                        sinceTalkId = it.last().talkId
+                        for(t in it) {
+                            getSendersName(t)
+                        }
+                    }
+
+                    println("sinceTalkId: $sinceTalkId")
+                    adapter?.notifyDataSetChanged()
+                    if(alive)
+                        getMessageWithLongPolling()
+                }, {
+                    Toast.makeText(this, "get talk failed: $it", Toast.LENGTH_SHORT).show()
+                    println("get talk failed: $it")
+                    if(alive)
+                        getMessageWithLongPolling()
                 })
     }
 
