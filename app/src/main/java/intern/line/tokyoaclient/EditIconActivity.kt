@@ -10,7 +10,6 @@ import android.os.ParcelFileDescriptor
 import android.support.v7.app.AppCompatActivity
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.imageService
-import intern.line.tokyoaclient.R
 import kotlinx.android.synthetic.main.activity_edit_icon.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
