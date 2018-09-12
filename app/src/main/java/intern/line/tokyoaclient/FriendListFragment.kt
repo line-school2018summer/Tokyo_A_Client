@@ -26,7 +26,6 @@ import java.util.*
 private lateinit var friendList: ListView
 private lateinit var addFriendButton: Button
 private lateinit var userIconImageView: ImageView
-// private var adapter: UserListAdapter? = null
 private var adapter: UserListAdapterWithImage? = null
 
 private lateinit var userId: String
@@ -44,7 +43,6 @@ class FriendListFragment : Fragment() {
         friendList = v.findViewById(R.id.friendList) as ListView
         userIconImageView = v.findViewById(R.id.icon) as ImageView
 
-        // adapter = UserListAdapter(context!!, ArrayList())
         adapter = UserListAdapterWithImage(context!!, ArrayList())
         friendList.setAdapter(adapter)
 
@@ -121,7 +119,6 @@ class FriendListFragment : Fragment() {
                 .subscribe({
                     Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
-                    // adapter?.addAll(it)
                     getIcon(it.id, it.name)
                 }, {
                     Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
