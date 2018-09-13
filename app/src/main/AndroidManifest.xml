@@ -28,6 +28,7 @@
         <activity android:name=".TabLayoutActivity" />
         <activity android:name=".localDBDebugActivity" />
         <activity android:name=".EditNameActivity" />
+        <activity android:name=".EditIconActivity" />
     </application>
 
 </manifest>
