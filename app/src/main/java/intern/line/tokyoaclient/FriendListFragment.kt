@@ -1,6 +1,7 @@
 package intern.line.tokyoaclient
 
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
@@ -42,6 +43,8 @@ class FriendListFragment : Fragment() {
     // localDB
     private lateinit var fdb: SQLiteDatabase
     private lateinit var helper: FriendDBHelper
+
+    private val REQUEST_ADD_FRIEND = 1 // request code
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -105,8 +108,8 @@ class FriendListFragment : Fragment() {
                     for (s in it) {
                         getFriendName(s.friendId)
                     }
-                    Toast.makeText(context, "get friend list succeeded", Toast.LENGTH_SHORT).show()
-                    println("get friend list succeeded: $it")
+                    // Toast.makeText(context, "get friend list succeeded", Toast.LENGTH_SHORT).show()
+                    // println("get friend list succeeded: $it")
                 }, {
                     Toast.makeText(context, "get friend list failed: $it", Toast.LENGTH_LONG).show()
                     println("get friend list failed: $it")
@@ -129,8 +132,8 @@ class FriendListFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
-                    println("get name succeeded: $it")
+                    // Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    // println("get name succeeded: $it")
                     (v.findViewById(R.id.ownNameText) as TextView).text = it.name
                     getOwnIcon(idStr)
                 }, {
@@ -144,8 +147,8 @@ class FriendListFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
-                    println("get image url succeeded: $it")
+                    // Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    // println("get image url succeeded: $it")
                     if(it.pathToFile != "") {
                         Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(userIconImageView)
                     } else {
@@ -162,8 +165,8 @@ class FriendListFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
-                    println("get name succeeded: $it")
+                    // Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    // println("get name succeeded: $it")
                     getIcon(it.id, it.name)
                 }, {
                     Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
@@ -176,8 +179,8 @@ class FriendListFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
-                    println("get image url succeeded: $it")
+                    // Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    // println("get image url succeeded: $it")
                     if (it.pathToFile != "") {
                         adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
                     } else {
@@ -209,7 +212,7 @@ class FriendListFragment : Fragment() {
     private fun goToAddFriend(userId: String) {
         val intent = Intent(context, AddFriendActivity::class.java)
         intent.putExtra("userId", userId)
-        startActivity(intent)
+        startActivityForResult(intent, REQUEST_ADD_FRIEND)
     }
 
     private fun goToTalk(roomId: Int, name: String) {
@@ -220,4 +223,12 @@ class FriendListFragment : Fragment() {
         startActivity(intent)
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        // super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_ADD_FRIEND && resultCode == RESULT_OK) {
+            if(data != null) {
+                getFriendName(data.getStringExtra("newFriendId"))
+            }
+        }
+    }
 }
