@@ -46,3 +46,14 @@ data class RoomMember(
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
+
+data class TalkWithImageUrl(
+        var talkId: Long = -1,
+        var senderName: String = "sender",
+        var roomId: Long = -1,
+        var text: String = "Hello, world!",
+        var numRead: Long = 0,
+        var pathToFile: String,
+        var createdAt: Timestamp = Timestamp(0L),
+        var updatedAt: Timestamp = Timestamp(0L)
+)

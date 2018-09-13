@@ -20,6 +20,7 @@ import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -28,6 +29,7 @@ import java.util.*
 
 private lateinit var friendList: ListView
 private lateinit var addFriendButton: Button
+private lateinit var data: ArrayList<UserProfile>
 private var adapter: UserListAdapter? = null
 
 private lateinit var userId: String
@@ -47,7 +49,8 @@ class FriendListFragment : Fragment() {
         addFriendButton = v.findViewById(R.id.addFriendButton) as Button
         friendList = v.findViewById(R.id.friendList) as ListView
 
-        adapter = UserListAdapter(context!!, ArrayList())
+        data = ArrayList()
+        adapter = UserListAdapter(context!!, data)
         friendList.setAdapter(adapter)
 
         try {
@@ -79,7 +82,7 @@ class FriendListFragment : Fragment() {
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
             val roomId: Int = num1 + num2
-            goToTalk(roomId)
+            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
         }
         return v
     }
@@ -134,6 +137,7 @@ class FriendListFragment : Fragment() {
                     Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
                     println("get name succeeded: $it")
                     adapter?.addAll(it)
+                    Collections.sort(data, NameComparator())
                 }, {
                     Toast.makeText(context, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
@@ -158,8 +162,9 @@ class FriendListFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun goToTalk(roomId: Int) {
+    private fun goToTalk(roomId: Int, name: String) {
         val intent = Intent(context, TalkActivity::class.java)
+        intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)
         intent.putExtra("roomId", roomId.toString())
         startActivity(intent)
