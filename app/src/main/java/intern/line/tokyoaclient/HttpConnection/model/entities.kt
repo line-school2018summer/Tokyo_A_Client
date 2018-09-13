@@ -12,7 +12,7 @@ data class UserProfile(
 data class Talk(
         var talkId: Long = -1,
         var senderId: String = "sender",
-        var roomId: Long = -1,
+        var roomId: String = "room0",
         var text: String = "Hello, world!",
         var numRead: Long = 0,
         var createdAt: Timestamp = Timestamp(0L),

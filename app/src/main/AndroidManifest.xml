@@ -26,6 +26,7 @@
         <activity android:name=".FriendListActivity" />
         <activity android:name=".AddFriendActivity" />
         <activity android:name=".TabLayoutActivity" />
+        <activity android:name=".localDBDebugActivity" />
         <activity android:name=".EditNameActivity" />
     </application>
 
