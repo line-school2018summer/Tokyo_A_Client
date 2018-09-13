@@ -1,10 +1,13 @@
 package intern.line.tokyoaclient
 
+import android.app.Activity
 import android.content.ContentValues
+import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import rx.android.schedulers.AndroidSchedulers
@@ -16,6 +19,7 @@ import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class AddFriendActivity : AppCompatActivity() {
@@ -70,14 +74,23 @@ class AddFriendActivity : AppCompatActivity() {
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
             val pathToFile = data[position].pathToFile
-            addFriend(userId, friendId)
             if(USE_LOCAL_DB) {
                 addFriendToLocalDB(friendId, friendName, pathToFile) // 本来ならaddFriendの中でDBへの書き込みの成功が確認できてからlocalDBに追加するべき
             }
+            addFriend(userId, friendId)
         }
     }
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 戻るボタンが押されたときの処理
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
     private fun searchFriend() {
+        adapter?.clear() // 空にする
         var nameStr = searchNameText.text.toString()
         userProfileService.getUserByLikelyName(nameStr)
                 .subscribeOn(Schedulers.io())
@@ -135,10 +148,15 @@ class AddFriendActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Toast.makeText(this, "add friend succeeded", Toast.LENGTH_SHORT).show()
-                    println("search friend succeeded")
+                    println("add friend succeeded")
+                    // フレンド画面へのintent
+                    var intent = Intent()
+                    intent.putExtra("newFriendId", FriendId)
+                    setResult(Activity.RESULT_OK, intent)
+                    finish()
                 }, {
                     Toast.makeText(this, "add friend failed: $it", Toast.LENGTH_LONG).show()
-                    println("search friend failed: $it")
+                    println("add friend failed: $it")
                 })
     }
 
