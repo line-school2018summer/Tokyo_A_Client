@@ -35,9 +35,3 @@ class UserListAdapter(context: Context, users: List<UserProfile>) : ArrayAdapter
 }
 
 data class ViewHolder(val nameTextView: TextView, val idTextView: TextView)
-
-class NameComparator(): Comparator<UserProfile> {
-    override fun compare(lt: UserProfile, rt: UserProfile): Int {
-        return lt.name.compareTo(rt.name)
-    }
-}
