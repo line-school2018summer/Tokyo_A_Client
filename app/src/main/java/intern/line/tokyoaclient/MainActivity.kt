@@ -16,6 +16,8 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
 
+public val USE_LOCAL_DB = false
+
 class MainActivity : AppCompatActivity() {
     //firabaseauthオブジェクトとログインユーザーオブジェクトのインスタンスを作っておく
     private var mAuth = FirebaseAuth.getInstance()
@@ -46,7 +48,8 @@ class MainActivity : AppCompatActivity() {
             signIn()
         }
         goButton.setOnClickListener {
-            goTest()
+            // goTest()
+            golocalDBTest()
         }
     }
 
@@ -138,6 +141,12 @@ class MainActivity : AppCompatActivity() {
     private fun goTest() {
         var intent = Intent(this, TabLayoutActivity::class.java)
         //intent.putExtra("userId", uid)
+        startActivity(intent)
+    }
+
+    private fun golocalDBTest() {
+        var intent = Intent(this, localDBDebugActivity::class.java)
+        // intent.putExtra("userId", uid)
         startActivity(intent)
     }
 }

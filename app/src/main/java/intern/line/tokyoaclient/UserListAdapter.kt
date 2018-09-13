@@ -40,7 +40,6 @@ class UserListAdapter(context: Context, users: List<UserProfile>) : ArrayAdapter
 
 data class ViewHolder(val nameTextView: TextView, val idTextView: TextView)
 
-
 class UserListAdapterWithImage(context: Context, usersWithImageUrl: List<UserProfileWithImageUrl>) : ArrayAdapter<UserProfileWithImageUrl>(context, 0, usersWithImageUrl) {
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
@@ -53,7 +52,8 @@ class UserListAdapterWithImage(context: Context, usersWithImageUrl: List<UserPro
             holder = ViewHolderWithImage(
                     (view.findViewById(R.id.nameTextView) as TextView),
                     (view.findViewById(R.id.idTextView) as TextView),
-                    (view.findViewById(R.id.icon) as ImageView)
+                    (view.findViewById(R.id.icon) as ImageView),
+                    "default.jpg"
             )
             view.tag = holder
         } else {
@@ -63,9 +63,17 @@ class UserListAdapterWithImage(context: Context, usersWithImageUrl: List<UserPro
         val user = getItem(position) as UserProfileWithImageUrl
         holder.nameTextView.text = user.name
         holder.idTextView.text = user.id
+        holder.pathToFile = user.pathToFile
         Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + user.pathToFile).into(holder.iconImageView)
         return view!!
     }
 }
 
-data class ViewHolderWithImage(val nameTextView: TextView, val idTextView: TextView, val iconImageView: ImageView)
+data class ViewHolderWithImage(val nameTextView: TextView, val idTextView: TextView, val iconImageView: ImageView, var pathToFile: String)
+
+class NameComparator(): Comparator<UserProfileWithImageUrl> {
+    override fun compare(lt: UserProfileWithImageUrl, rt: UserProfileWithImageUrl): Int {
+        return lt.name.compareTo(rt.name)
+    }
+}
+

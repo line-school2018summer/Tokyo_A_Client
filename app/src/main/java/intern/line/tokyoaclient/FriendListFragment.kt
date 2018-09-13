@@ -2,6 +2,8 @@ package intern.line.tokyoaclient
 
 
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -14,9 +16,13 @@ import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import kotlinx.android.synthetic.main.fragment_setting.*
+import intern.line.tokyoaclient.HttpConnection.model.UserProfile
+import intern.line.tokyoaclient.HttpConnection.userProfileService
+import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -27,11 +33,15 @@ private lateinit var friendList: ListView
 private lateinit var addFriendButton: Button
 private lateinit var userIconImageView: ImageView
 private var adapter: UserListAdapterWithImage? = null
+private lateinit var data: ArrayList<UserProfileWithImageUrl>
 
 private lateinit var userId: String
 
 class FriendListFragment : Fragment() {
     private lateinit var v: View
+    // localDB
+    private lateinit var fdb: SQLiteDatabase
+    private lateinit var helper: FriendDBHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -43,11 +53,35 @@ class FriendListFragment : Fragment() {
         friendList = v.findViewById(R.id.friendList) as ListView
         userIconImageView = v.findViewById(R.id.icon) as ImageView
 
-        adapter = UserListAdapterWithImage(context!!, ArrayList())
+        data = ArrayList()
+        adapter = UserListAdapterWithImage(context!!, data)
         friendList.setAdapter(adapter)
 
+        if(USE_LOCAL_DB) {
+            try {
+                helper = FriendDBHelper(context)
+            } catch (e: SQLiteException) {
+                Toast.makeText(context, "helper error: ${e.toString()}", Toast.LENGTH_SHORT).show()
+                println("helper error: ${e.toString()}")
+            }
+
+            try {
+                fdb = helper.readableDatabase
+                Toast.makeText(context, "accessed to database", Toast.LENGTH_SHORT).show()
+            } catch (e: SQLiteException) {
+                Toast.makeText(context, "readable error: ${e.toString()}", Toast.LENGTH_SHORT).show()
+                println("readable error: ${e.toString()}")
+            }
+        } else {
+            context!!.deleteDatabase(FriendDBHelper(context).databaseName)
+        }
+
         getOwnName(userId)
-        getFriend(userId)
+        if(USE_LOCAL_DB) {
+            getFriendByLocalDB()
+        } else {
+            getFriend(userId)
+        }
 
         addFriendButton.setOnClickListener {
             goToAddFriend(userId)
@@ -57,7 +91,7 @@ class FriendListFragment : Fragment() {
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
             val roomId: Int = num1 + num2
-            goToTalk(roomId)
+            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
         }
         return v
     }
@@ -77,6 +111,17 @@ class FriendListFragment : Fragment() {
                     Toast.makeText(context, "get friend list failed: $it", Toast.LENGTH_LONG).show()
                     println("get friend list failed: $it")
                 })
+    }
+
+    private fun getFriendByLocalDB() {
+        adapter?.clear() // 空にする
+        val sqlstr = "select * from friends"
+        val cursor = fdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        while (cursor.moveToNext()) {
+            getFriendNameByLocalDB(cursor.getString(0))
+        }
+        adapter?.notifyDataSetChanged()
     }
 
     private fun getOwnName(idStr: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
@@ -133,16 +178,32 @@ class FriendListFragment : Fragment() {
                 .subscribe({
                     Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
                     println("get image url succeeded: $it")
-                    if(it.pathToFile != "") {
+                    if (it.pathToFile != "") {
                         adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
                     } else {
                         adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
                     }
+                    Collections.sort(data, NameComparator())
                 }, {
                     adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                    Collections.sort(data, NameComparator())
                     Toast.makeText(context, "get image url failed: $it", Toast.LENGTH_LONG).show()
                     println("get image url failed: $it")
                 })
+    }
+
+    private fun getFriendNameByLocalDB(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+        println("get friend from localDB")
+        val sqlstr = "select * from friend_data where id = '$friendId'"
+        val cursor = fdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        while (cursor.moveToNext()) {
+            adapter?.add(UserProfileWithImageUrl(
+                    id = cursor.getString(0), // id
+                    name = cursor.getString(1), // name
+                    pathToFile = cursor.getString(2)
+            )) // created_atとupdated_atはdefault値．今後created_atとupdated_atが重要になってきたら変更しないといけない
+        }
     }
 
     private fun goToAddFriend(userId: String) {
@@ -151,8 +212,9 @@ class FriendListFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun goToTalk(roomId: Int) {
+    private fun goToTalk(roomId: Int, name: String) {
         val intent = Intent(context, TalkActivity::class.java)
+        intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)
         intent.putExtra("roomId", roomId.toString())
         startActivity(intent)
