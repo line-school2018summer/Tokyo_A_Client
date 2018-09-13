@@ -11,9 +11,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import intern.line.tokyoaclient.HttpConnection.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_setting.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
+
+public val USE_LOCAL_DB = false
 
 class MainActivity : AppCompatActivity() {
     //firabaseauthオブジェクトとログインユーザーオブジェクトのインスタンスを作っておく
@@ -98,6 +101,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createAccount(idStr: String, nameStr: String) {
+        addUser(idStr, nameStr)
+        addDefaultImage(idStr)
+    }
+
+    private fun addUser(idStr: String, nameStr: String) {
         userProfileService.addUser(idStr, nameStr)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -107,6 +115,20 @@ class MainActivity : AppCompatActivity() {
                 }, {
                     Toast.makeText(this, "create failed: $it", Toast.LENGTH_LONG).show()
                     println("create failed: $it")
+                })
+    }
+
+    private fun addDefaultImage(idStr: String) {
+        // デフォルトアイコンの追加
+        imageService.addDefaultImage(idStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    Toast.makeText(this, "create image succeeded", Toast.LENGTH_LONG).show()
+                    println("create image succeeded")
+                }, {
+                    Toast.makeText(this, "create image failed: $it", Toast.LENGTH_LONG).show()
+                    println("create image failed: $it")
                 })
     }
 

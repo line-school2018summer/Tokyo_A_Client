@@ -22,6 +22,9 @@ interface ImageService {
     @POST("/image/create/{id}")
     fun addImage(@Path("id") id: String, @Part file: MultipartBody.Part): Completable
 
+    @POST("/image/create/default/{id}")
+    fun addDefaultImage(@Path("id") id: String): Completable
+
     @Multipart
     @PUT("/image/modify/{id}")
     fun modifyImage(@Path("id") id: String, @Part file: MultipartBody.Part): Completable

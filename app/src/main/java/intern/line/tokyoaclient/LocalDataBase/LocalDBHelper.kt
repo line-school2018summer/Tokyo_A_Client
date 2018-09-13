@@ -40,9 +40,10 @@ class FriendDBHelper(var context: Context?) : SQLiteOpenHelper(context, "friend_
                 ");")
         // フレンド名
         // フレンドがユーザ名を変更した時に差分が出てしまう
-        db?.execSQL("create table friend_name ( " +
+        db?.execSQL("create table friend_data ( " +
                 "id text not null, " +
-                "name text not null " +
+                "name text not null, " +
+                "path_to_file text not null" +
                 ");")
 
         Toast.makeText(context, "table created", Toast.LENGTH_SHORT).show()
@@ -52,7 +53,8 @@ class FriendDBHelper(var context: Context?) : SQLiteOpenHelper(context, "friend_
         //バージョンアップしたときに実行される
         //テーブルのdeleteなどを行う
         // TODO: バージョンアップ時の挙動
-        db?.execSQL("drop table if exists friend_name")
+        db?.execSQL("drop table if exists friends")
+        db?.execSQL("drop table if exists friend_data")
         onCreate(db)
         Toast.makeText(context, "table updated", Toast.LENGTH_SHORT).show()
     }
