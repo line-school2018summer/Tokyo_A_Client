@@ -1,5 +1,6 @@
 package intern.line.tokyoaclient.HttpConnection.model
 
+import java.sql.Time
 import java.sql.Timestamp
 
 data class UserProfile(
@@ -34,14 +35,14 @@ data class ImageUrl(
 )
 
 data class Room(
-        var roomId: Long = -1,
+        var roomId: String = "room0",
         var roomName: String = "default",
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
 
 data class RoomMember(
-        var roomId: Long = -1,
+        var roomId: String = "room0",
         var uid: String = "",
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
@@ -62,4 +63,12 @@ data class TalkWithImageUrl(
         var pathToFile: String,
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
+)
+
+data class RoomWithImageUrlAndLatestTalkTimestamp(
+        var roomId: String = "room0",
+        var roomName: String = "default",
+        var pathToFile: String,
+        val latestTalk: String = "hoge",
+        var latestTalkTime: Timestamp = Timestamp(0L)
 )

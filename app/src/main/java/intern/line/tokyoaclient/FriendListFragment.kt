@@ -26,10 +26,6 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-// private const val ARG_PARAM1 = "param1"
-
 private lateinit var friendList: ListView
 private lateinit var addFriendButton: Button
 private lateinit var userIconImageView: ImageView
