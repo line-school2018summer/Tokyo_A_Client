@@ -25,10 +25,14 @@ import kotlin.collections.ArrayList
 class AddFriendActivity : AppCompatActivity() {
 
     private lateinit var searchFriendResultList: ListView
+    private lateinit var alreadyFriendList: ListView
     private lateinit var searchFriendButton: Button
     private lateinit var searchNameText: EditText
-    private var adapter: UserListAdapterWithImage? = null
-    private lateinit var data: ArrayList<UserProfileWithImageUrl>
+    private var alreadyFriendAdapter: UserListAdapterWithImage? = null
+    private var newFriendAdapter: UserListAdapterWithImage? = null
+    private lateinit var alreadyFriendData: ArrayList<UserProfileWithImageUrl>
+    private lateinit var newFriendData: ArrayList<UserProfileWithImageUrl>
+    private lateinit var friendIdData: ArrayList<String>
     // localDB
     private lateinit var fdb: SQLiteDatabase
     private lateinit var helper: FriendDBHelper
@@ -41,13 +45,18 @@ class AddFriendActivity : AppCompatActivity() {
 
         userId = intent.getStringExtra("userId")
         searchFriendButton = (findViewById(R.id.searchFriendButton)) as Button
+        alreadyFriendList = (findViewById(R.id.alreadyFriendList)) as ListView
         searchFriendResultList = (findViewById(R.id.searchFriendResultList)) as ListView
         searchNameText = (findViewById(R.id.searchNameText)) as EditText
 
-        data = ArrayList()
-        adapter = UserListAdapterWithImage(this, data)
-        searchFriendResultList.setAdapter(adapter)
+        alreadyFriendData = ArrayList()
+        alreadyFriendAdapter = UserListAdapterWithImage(this, alreadyFriendData)
+        alreadyFriendList.setAdapter(alreadyFriendAdapter)
+        newFriendData = ArrayList()
+        newFriendAdapter = UserListAdapterWithImage(this, newFriendData)
+        searchFriendResultList.setAdapter(newFriendAdapter)
 
+        friendIdData = ArrayList() // すでに友達
 
         if(USE_LOCAL_DB) {
             try {
@@ -67,17 +76,27 @@ class AddFriendActivity : AppCompatActivity() {
             }
         }
 
+        getFriend(userId)
+
         searchFriendButton.setOnClickListener {
             searchFriend()
+        }
+        alreadyFriendList.setOnItemClickListener { adapterView, view, position, id ->
+            val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
+            val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
+            val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
+            val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
+            val roomId: Int = num1 + num2
+            goToTalk(roomId, friendName)
         }
         searchFriendResultList.setOnItemClickListener { adapterView, view, position, id ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
-            val pathToFile = data[position].pathToFile
+            val pathToFile = newFriendData[position].pathToFile
             if(USE_LOCAL_DB) {
                 addFriendToLocalDB(friendId, friendName, pathToFile) // 本来ならaddFriendの中でDBへの書き込みの成功が確認できてからlocalDBに追加するべき
             }
-            addFriend(userId, friendId)
+            addFriend(userId, friendId, friendName)
         }
     }
 
@@ -89,45 +108,64 @@ class AddFriendActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    private fun getFriend(userId: String) {
+        friendService.getFriendById(userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    friendIdData.addAll(it.map{friend ->  friend.friendId})
+                    // Toast.makeText(context, "get friend list succeeded", Toast.LENGTH_SHORT).show()
+                    // println("get friend list succeeded: $it")
+                }, {
+                    Toast.makeText(this, "get friend list failed: $it", Toast.LENGTH_LONG).show()
+                    println("get friend list failed: $it")
+                })
+    }
+
     private fun searchFriend() {
-        adapter?.clear() // 空にする
+        alreadyFriendAdapter?.clear() // 空にする
+        newFriendAdapter?.clear() // 空にする
         var nameStr = searchNameText.text.toString()
         userProfileService.getUserByLikelyName(nameStr)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     for (u in it) {
-                        getFriendName(u.id)
+                        if(u.id in friendIdData) {
+                            getFriendName(u.id, alreadyFriendData, alreadyFriendAdapter)
+                        } else {
+                            getFriendName(u.id, newFriendData, newFriendAdapter)
+                        }
                     }
-                    Toast.makeText(this, "search friend succeeded", Toast.LENGTH_SHORT).show()
-                    println("search friend succeeded: $it")
+                    // Toast.makeText(this, "search friend succeeded", Toast.LENGTH_SHORT).show()
+                    // println("search friend succeeded: $it")
                 }, {
                     Toast.makeText(this, "search friend failed: $it", Toast.LENGTH_LONG).show()
                     println("search friend failed: $it")
                 })
     }
 
-    private fun getFriendName(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    private fun getFriendName(friendId: String, data: ArrayList<UserProfileWithImageUrl>, adapter: UserListAdapterWithImage?) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
         userProfileService.getUserById(friendId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
-                    println("get name succeeded: $it")
-                    getIcon(it.id, it.name)
+                    // Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
+                    // println("get name succeeded: $it")
+                    getIcon(it.id, it.name, data, adapter)
                 }, {
                     Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
                     println("get name failed: $it")
                 })
     }
 
-    private fun getIcon(idStr: String, nameStr: String) {
+    private fun getIcon(idStr: String, nameStr: String, data: ArrayList<UserProfileWithImageUrl>, adapter: UserListAdapterWithImage?) {
         imageService.getImageUrlById(idStr)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
-                    println("get image url succeeded: $it")
+                    // Toast.makeText(this, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
+                    // println("get image url succeeded: $it")
                     if (it.pathToFile != "") {
                         adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
                     } else {
@@ -142,16 +180,16 @@ class AddFriendActivity : AppCompatActivity() {
                 })
     }
 
-    private fun addFriend(userId: String, FriendId: String) {
-        friendService.addFriend(userId, FriendId)
+    private fun addFriend(userId: String, friendId: String, friendName: String) {
+        friendService.addFriend(userId, friendId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    Toast.makeText(this, "add friend succeeded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "$friendName をフレンドに追加しました！", Toast.LENGTH_SHORT).show()
                     println("add friend succeeded")
                     // フレンド画面へのintent
                     var intent = Intent()
-                    intent.putExtra("newFriendId", FriendId)
+                    intent.putExtra("newFriendId", friendId)
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }, {
@@ -187,5 +225,14 @@ class AddFriendActivity : AppCompatActivity() {
             Toast.makeText(this, "error in INSERT", Toast.LENGTH_SHORT).show()
             return
         }
+    }
+
+    private fun goToTalk(roomId: Int, name: String) {
+        val intent = Intent(this, TalkActivity::class.java)
+        intent.putExtra("roomName", name)
+        intent.putExtra("userId", userId)
+        intent.putExtra("roomId", roomId.toString())
+        startActivity(intent)
+        finish()
     }
 }
