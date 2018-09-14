@@ -8,11 +8,11 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
-import intern.line.tokyoaclient.HttpConnection.model.RoomWithImageUrlAndLatestTalkTimestamp
+import intern.line.tokyoaclient.HttpConnection.model.RoomWithImageUrlAndLatestTalk
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 
 
-class RoomAdapterWithImage(context: Context, rooms: List<RoomWithImageUrlAndLatestTalkTimestamp>) : ArrayAdapter<RoomWithImageUrlAndLatestTalkTimestamp>(context, 0, rooms) {
+class RoomAdapterWithImage(context: Context, rooms: List<RoomWithImageUrlAndLatestTalk>) : ArrayAdapter<RoomWithImageUrlAndLatestTalk>(context, 0, rooms) {
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
@@ -33,7 +33,7 @@ class RoomAdapterWithImage(context: Context, rooms: List<RoomWithImageUrlAndLate
             holder = view.tag as RoomViewHolder
         }
 
-        val room = getItem(position) as RoomWithImageUrlAndLatestTalkTimestamp
+        val room = getItem(position) as RoomWithImageUrlAndLatestTalk
         holder.nameTextView.text = room.roomName
         holder.latestTalkTextView.text = room.latestTalk
         holder.latestTalkTime.text = room.latestTalkTime.toString().substring(11, 16)
@@ -51,8 +51,8 @@ data class RoomViewHolder(
         var pathToFile: String
 )
 
-class RoomComparator(): Comparator<RoomWithImageUrlAndLatestTalkTimestamp> {
-    override fun compare(lt: RoomWithImageUrlAndLatestTalkTimestamp, rt: RoomWithImageUrlAndLatestTalkTimestamp): Int {
-        return lt.latestTalkTime.compareTo(rt.latestTalkTime)
+class RoomComparator(): Comparator<RoomWithImageUrlAndLatestTalk> {
+    override fun compare(lt: RoomWithImageUrlAndLatestTalk, rt: RoomWithImageUrlAndLatestTalk): Int {
+        return rt.latestTalkTime.compareTo(lt.latestTalkTime)
     }
 }

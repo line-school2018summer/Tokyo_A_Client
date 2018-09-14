@@ -12,13 +12,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
-import intern.line.tokyoaclient.HttpConnection.friendService
-import intern.line.tokyoaclient.HttpConnection.imageService
+import intern.line.tokyoaclient.HttpConnection.*
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
-import intern.line.tokyoaclient.HttpConnection.userProfileService
 import kotlinx.android.synthetic.main.fragment_setting.*
 import intern.line.tokyoaclient.HttpConnection.model.UserProfile
-import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -56,7 +53,7 @@ class FriendListFragment : Fragment() {
         adapter = UserListAdapterWithImage(context!!, data)
         friendList.setAdapter(adapter)
 
-        if(USE_LOCAL_DB) {
+        if (USE_LOCAL_DB) {
             try {
                 helper = FriendDBHelper(context)
             } catch (e: SQLiteException) {
@@ -76,7 +73,7 @@ class FriendListFragment : Fragment() {
         }
 
         getOwnName(userId)
-        if(USE_LOCAL_DB) {
+        if (USE_LOCAL_DB) {
             getFriendByLocalDB()
         } else {
             getFriend(userId)
@@ -89,7 +86,8 @@ class FriendListFragment : Fragment() {
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
-            val roomId: Int = num1 + num2
+            val roomId: String = (num1 + num2).toString()
+            addMemberToRoomAfterCreateRoom(arrayListOf(userId, friendId), roomId)
             goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
         }
         return v
@@ -145,7 +143,7 @@ class FriendListFragment : Fragment() {
                 .subscribe({
                     // Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
                     // println("get image url succeeded: $it")
-                    if(it.pathToFile != "") {
+                    if (it.pathToFile != "") {
                         Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(userIconImageView)
                     } else {
                         Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(userIconImageView)
@@ -205,13 +203,38 @@ class FriendListFragment : Fragment() {
         }
     }
 
+    private fun addMemberToRoomAfterCreateRoom(userIds: ArrayList<String>, roomId: String) {
+        roomService.addRoom(roomId, "default_room")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    for(u in userIds) {
+                        addMemberToRoom(u, roomId)
+                    }
+                }, {
+                    Toast.makeText(context, "add room url failed: $it", Toast.LENGTH_LONG).show()
+                    println("add room failed: $it")
+                })
+    }
+
+    private fun addMemberToRoom(userId: String, roomId: String) {
+        roomService.addRoomMember(roomId, userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                }, {
+                    Toast.makeText(context, "add room member url failed: $it", Toast.LENGTH_LONG).show()
+                    println("add room member failed: $it")
+                })
+    }
+
     private fun goToAddFriend(userId: String) {
         val intent = Intent(context, AddFriendActivity::class.java)
         intent.putExtra("userId", userId)
         startActivityForResult(intent, REQUEST_ADD_FRIEND)
     }
 
-    private fun goToTalk(roomId: Int, name: String) {
+    private fun goToTalk(roomId: String, name: String) {
         val intent = Intent(context, TalkActivity::class.java)
         intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)

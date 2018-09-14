@@ -65,10 +65,10 @@ data class TalkWithImageUrl(
         var updatedAt: Timestamp = Timestamp(0L)
 )
 
-data class RoomWithImageUrlAndLatestTalkTimestamp(
+data class RoomWithImageUrlAndLatestTalk(
         var roomId: String = "room0",
         var roomName: String = "default",
         var pathToFile: String,
-        val latestTalk: String = "hoge",
+        var latestTalk: String = "hoge",
         var latestTalkTime: Timestamp = Timestamp(0L)
 )

@@ -10,7 +10,7 @@
         android:layout_height="60dp" />
 
     <TextView
-        android:id="@+id/roomNameTextView"
+        android:id="@+id/nameTextView"
         android:layout_height="20dp"
         android:layout_width="match_parent"
         android:gravity="center_vertical"
@@ -33,7 +33,7 @@
         android:layout_marginRight="60dp"
         android:text="hogehogehogehogehogehogehogehogehogehogehogehoge"
         android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/roomNameTextView"
+        app:layout_constraintTop_toBottomOf="@+id/nameTextView"
         app:layout_constraintStart_toEndOf="@+id/icon" />
 
     <TextView
