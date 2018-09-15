@@ -4,12 +4,12 @@ import android.content.Context
 import android.os.Bundle
 import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AppCompatActivity
-import android.util.EventLog
 import android.view.KeyEvent
 import android.view.MotionEvent
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import intern.line.tokyoaclient.Adapter.TalkAdapter
+import intern.line.tokyoaclient.Adapter.TimeComparator
 import kotlinx.android.synthetic.main.activity_talk_page.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -20,7 +20,6 @@ import intern.line.tokyoaclient.HttpConnection.talkService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.schedule
 
 
 class TalkActivity : AppCompatActivity() {
@@ -63,7 +62,7 @@ class TalkActivity : AppCompatActivity() {
             sendMessage()
         }
 
-        talkList.setOnItemClickListener { adapterView, view, position, id ->
+        talkList.setOnItemClickListener { _, _, _, _ ->
             focusOnBackground()
         }
 

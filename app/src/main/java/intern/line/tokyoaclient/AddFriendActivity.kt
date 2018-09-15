@@ -14,6 +14,8 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import android.widget.Toast
 import android.widget.TextView
+import intern.line.tokyoaclient.Adapter.NameComparator
+import intern.line.tokyoaclient.Adapter.UserListAdapterWithImage
 import intern.line.tokyoaclient.HttpConnection.friendService
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
@@ -81,7 +83,7 @@ class AddFriendActivity : AppCompatActivity() {
         searchFriendButton.setOnClickListener {
             searchFriend()
         }
-        alreadyFriendList.setOnItemClickListener { adapterView, view, position, id ->
+        alreadyFriendList.setOnItemClickListener { _, view, _, _ ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
@@ -89,7 +91,7 @@ class AddFriendActivity : AppCompatActivity() {
             val roomId: Int = num1 + num2
             goToTalk(roomId, friendName)
         }
-        searchFriendResultList.setOnItemClickListener { adapterView, view, position, id ->
+        searchFriendResultList.setOnItemClickListener { _, view, position, _ ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
             val pathToFile = newFriendData[position].pathToFile

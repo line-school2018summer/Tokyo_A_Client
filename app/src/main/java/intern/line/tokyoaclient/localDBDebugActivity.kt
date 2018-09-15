@@ -8,6 +8,7 @@ import android.widget.*
 import kotlinx.android.synthetic.main.activity_localdb_debug.*
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
+import intern.line.tokyoaclient.Adapter.TestDataAdapter
 import intern.line.tokyoaclient.HttpConnection.model.Talk
 import intern.line.tokyoaclient.LocalDataBase.TalkDBHelper
 import java.sql.Time

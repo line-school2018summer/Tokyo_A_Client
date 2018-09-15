@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import intern.line.tokyoaclient.HttpConnection.model.RoomWithImageUrlAndLatestTalk
-import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
+import intern.line.tokyoaclient.R
 
 
 class RoomAdapterWithImage(context: Context, rooms: List<RoomWithImageUrlAndLatestTalk>) : ArrayAdapter<RoomWithImageUrlAndLatestTalk>(context, 0, rooms) {

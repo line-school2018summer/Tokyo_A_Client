@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Fragment
 
 
 import android.content.Intent
@@ -12,8 +12,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import intern.line.tokyoaclient.EditIconActivity
+import intern.line.tokyoaclient.EditNameActivity
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
+import intern.line.tokyoaclient.R
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 

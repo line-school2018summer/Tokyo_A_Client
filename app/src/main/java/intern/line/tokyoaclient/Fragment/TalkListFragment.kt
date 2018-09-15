@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Fragment
 
 
 import android.content.Intent
@@ -8,13 +8,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ListView
-import android.widget.TextView
 import android.widget.Toast
+import intern.line.tokyoaclient.Adapter.RoomAdapterWithImage
+import intern.line.tokyoaclient.Adapter.RoomComparator
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.RoomWithImageUrlAndLatestTalk
 import intern.line.tokyoaclient.HttpConnection.roomService
 import intern.line.tokyoaclient.HttpConnection.talkService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
+import intern.line.tokyoaclient.R
+import intern.line.tokyoaclient.TalkActivity
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
@@ -47,7 +50,7 @@ class TalkListFragment : Fragment() {
 
         getRoom(userId)
 
-        roomList.setOnItemClickListener { adapterView, view, position, id ->
+        roomList.setOnItemClickListener { _, _, position, _ ->
             val roomId: String = data[position].roomId
             goToTalk(roomId, data[position].roomName)
         }

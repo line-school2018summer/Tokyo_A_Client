@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Adapter
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import intern.line.tokyoaclient.HttpConnection.model.Talk
+import intern.line.tokyoaclient.R
 
 class TestDataAdapter(context: Context, data: List<Talk>) : ArrayAdapter<Talk>(context, 0, data) {
     private val layoutInflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater

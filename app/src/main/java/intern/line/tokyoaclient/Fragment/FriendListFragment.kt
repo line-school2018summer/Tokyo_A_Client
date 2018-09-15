@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Fragment
 
 
 import android.app.Activity.RESULT_OK
@@ -12,10 +12,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.bumptech.glide.Glide
+import intern.line.tokyoaclient.*
+import intern.line.tokyoaclient.Adapter.NameComparator
+import intern.line.tokyoaclient.Adapter.UserListAdapterWithImage
 import intern.line.tokyoaclient.HttpConnection.*
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
-import kotlinx.android.synthetic.main.fragment_setting.*
-import intern.line.tokyoaclient.HttpConnection.model.UserProfile
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
@@ -25,6 +26,7 @@ import kotlin.collections.ArrayList
 
 private lateinit var friendList: ListView
 private lateinit var addFriendButton: Button
+private lateinit var createGroupButton: Button
 private lateinit var userIconImageView: ImageView
 private var adapter: UserListAdapterWithImage? = null
 private lateinit var data: ArrayList<UserProfileWithImageUrl>
@@ -46,6 +48,7 @@ class FriendListFragment : Fragment() {
         //MyPagerAdapterで設定しておいたargumentsを取得
         userId = arguments!!.getString("userId")
         addFriendButton = v.findViewById(R.id.addFriendButton) as Button
+        createGroupButton = v.findViewById(R.id.createGroupButton) as Button
         friendList = v.findViewById(R.id.friendList) as ListView
         userIconImageView = v.findViewById(R.id.icon) as ImageView
 
@@ -82,7 +85,10 @@ class FriendListFragment : Fragment() {
         addFriendButton.setOnClickListener {
             goToAddFriend(userId)
         }
-        friendList.setOnItemClickListener { adapterView, view, position, id ->
+        createGroupButton.setOnClickListener {
+            goToCreateGroup(userId)
+        }
+        friendList.setOnItemClickListener { _, view, _, _ ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
@@ -239,6 +245,12 @@ class FriendListFragment : Fragment() {
         intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)
         intent.putExtra("roomId", roomId.toString())
+        startActivity(intent)
+    }
+
+    private fun goToCreateGroup(userId: String) {
+        val intent = Intent(context, CreateGroupActivity::class.java)
+        intent.putExtra("userId", userId)
         startActivity(intent)
     }
 
