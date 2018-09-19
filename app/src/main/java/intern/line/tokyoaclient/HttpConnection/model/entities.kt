@@ -38,7 +38,8 @@ data class Room(
         var roomId: String = "room0",
         var roomName: String = "default",
         var createdAt: Timestamp = Timestamp(0L),
-        var updatedAt: Timestamp = Timestamp(0L)
+        var updatedAt: Timestamp = Timestamp(0L),
+        var isGroup: Boolean = false
 )
 
 data class RoomMember(
@@ -70,5 +71,7 @@ data class RoomWithImageUrlAndLatestTalk(
         var roomName: String = "default",
         var pathToFile: String,
         var latestTalk: String = "hoge",
-        var latestTalkTime: Timestamp = Timestamp(0L)
+        var latestTalkTime: Timestamp = Timestamp(0L),
+        var sinceTalkId: Long = -1,
+        var createdAt: Timestamp = Timestamp(0L)
 )

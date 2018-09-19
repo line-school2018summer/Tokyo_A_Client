@@ -10,6 +10,7 @@ import android.widget.TextView
 import com.bumptech.glide.Glide
 import intern.line.tokyoaclient.HttpConnection.model.RoomWithImageUrlAndLatestTalk
 import intern.line.tokyoaclient.R
+import java.sql.Timestamp
 
 
 class RoomAdapterWithImage(context: Context, rooms: List<RoomWithImageUrlAndLatestTalk>) : ArrayAdapter<RoomWithImageUrlAndLatestTalk>(context, 0, rooms) {
@@ -53,6 +54,15 @@ data class RoomViewHolder(
 
 class RoomComparator(): Comparator<RoomWithImageUrlAndLatestTalk> {
     override fun compare(lt: RoomWithImageUrlAndLatestTalk, rt: RoomWithImageUrlAndLatestTalk): Int {
-        return rt.latestTalkTime.compareTo(lt.latestTalkTime)
+        when {
+            rt.latestTalkTime.equals(Timestamp(0L)) && lt.latestTalkTime.equals(Timestamp(0L))
+                -> return rt.createdAt.compareTo(lt.createdAt)
+            rt.latestTalkTime.equals(Timestamp(0L))
+                -> return rt.createdAt.compareTo(lt.latestTalkTime)
+            lt.latestTalkTime.equals(Timestamp(0L))
+                -> return rt.latestTalkTime.compareTo(lt.createdAt)
+            else
+                -> return rt.latestTalkTime.compareTo(lt.latestTalkTime)
+        }
     }
 }

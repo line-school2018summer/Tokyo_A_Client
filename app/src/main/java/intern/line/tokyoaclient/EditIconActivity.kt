@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.ParcelFileDescriptor
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.imageService
 import kotlinx.android.synthetic.main.activity_edit_icon.*
@@ -50,6 +51,14 @@ class EditIconActivity : AppCompatActivity() {
         applyButton.setOnClickListener {
             updateIcon()
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 戻るボタンが押されたときの処理
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun openGallery() {

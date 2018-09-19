@@ -41,9 +41,7 @@ class MyPagerAdapter(fm: FragmentManager, uid: String) : FragmentPagerAdapter(fm
         return when (position) {
             0 -> "Friend List"
             1 -> "Talk List"
-            else -> {
-                return "Settings"
-            }
+            else -> "Settings"
         }
     }
 }

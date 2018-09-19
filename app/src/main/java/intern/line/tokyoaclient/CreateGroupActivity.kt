@@ -1,9 +1,11 @@
 package intern.line.tokyoaclient
 
+import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.Adapter.NameComparator
 import intern.line.tokyoaclient.Adapter.UserListAdapterWithImageSelection
@@ -12,6 +14,7 @@ import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
+import intern.line.tokyoaclient.LocalDataBase.FriendLocalDBService
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.util.*
@@ -24,12 +27,14 @@ class CreateGroupActivity : AppCompatActivity() {
     private lateinit var friendList: ListView
     private lateinit var counter: TextView
     private var count = 0
-    private lateinit var selectedUserId: ArrayList<String>
+    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrl>
     private var adapter: UserListAdapterWithImageSelection? = null
     private lateinit var data: ArrayList<UserProfileWithImageUrl>
     // localDB
     private lateinit var fdb: SQLiteDatabase
     private lateinit var helper: FriendDBHelper
+
+    private val REQUEST_CREATE_GROUP = 1 // request code
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,7 +44,7 @@ class CreateGroupActivity : AppCompatActivity() {
         friendList = (findViewById(R.id.friendList) as ListView)
         counter = (findViewById(R.id.counter) as TextView)
         count = 0
-        selectedUserId = ArrayList()
+        selectedUsers = ArrayList()
         data = ArrayList()
         adapter = UserListAdapterWithImageSelection(this, data)
         friendList.setAdapter(adapter)
@@ -73,21 +78,41 @@ class CreateGroupActivity : AppCompatActivity() {
 
         val createButton = findViewById(R.id.createButton) as Button
         createButton.setOnClickListener {
-            createGroup(selectedUserId)
+            createGroup(selectedUsers)
         }
 
         friendList.setOnItemClickListener { _, view, position, _ ->
             val check = view.findViewById<CheckedTextView>(R.id.nameTextView)
             if (check.isChecked) {
-                selectedUserId.remove(data[position].id)
+                selectedUsers.remove(data[position])
                 count--;
             } else {
                 count++;
-                selectedUserId.add(data[position].id)
+                selectedUsers.add(data[position])
             }
             counter.text = count.toString()
             check.toggle()
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 戻るボタンが押されたときの処理
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    private fun getFriendByLocalDB() {
+        adapter?.clear() // 空にする
+        FriendLocalDBService().getAllFriend(fdb, this) {
+            adapter?.add(UserProfileWithImageUrl(
+                    id = it.getString(0),
+                    name = it.getString(1),
+                    pathToFile = it.getString(2)
+            ))
+        }
+        adapter?.notifyDataSetChanged()
     }
 
     private fun getFriend(userId: String) {
@@ -99,23 +124,9 @@ class CreateGroupActivity : AppCompatActivity() {
                     for (s in it) {
                         getFriendName(s.friendId)
                     }
-                    // Toast.makeText(context, "get friend list succeeded", Toast.LENGTH_SHORT).show()
-                    // println("get friend list succeeded: $it")
                 }, {
-                    Toast.makeText(this, "get friend list failed: $it", Toast.LENGTH_LONG).show()
-                    println("get friend list failed: $it")
+                    debugLog(this, "get friend list failed: $it")
                 })
-    }
-
-    private fun getFriendByLocalDB() {
-        adapter?.clear() // 空にする
-        val sqlstr = "select * from friends"
-        val cursor = fdb.rawQuery(sqlstr, null)
-        cursor.moveToPosition(-1)
-        while (cursor.moveToNext()) {
-            getFriendNameByLocalDB(cursor.getString(0))
-        }
-        adapter?.notifyDataSetChanged()
     }
 
     private fun getFriendName(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
@@ -123,12 +134,9 @@ class CreateGroupActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    // Toast.makeText(context, "get name succeeded", Toast.LENGTH_SHORT).show()
-                    // println("get name succeeded: $it")
                     getIcon(it.id, it.name)
                 }, {
-                    Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
-                    println("get name failed: $it")
+                    debugLog(this, "get name failed: $it")
                 })
     }
 
@@ -137,8 +145,6 @@ class CreateGroupActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    // Toast.makeText(context, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
-                    // println("get image url succeeded: $it")
                     if (it.pathToFile != "") {
                         adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
                     } else {
@@ -148,26 +154,22 @@ class CreateGroupActivity : AppCompatActivity() {
                 }, {
                     adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
                     Collections.sort(data, NameComparator())
-                    Toast.makeText(this, "get image url failed: $it", Toast.LENGTH_LONG).show()
-                    println("get image url failed: $it")
+                    debugLog(this, "get image url failed: $it")
                 })
     }
 
-    private fun getFriendNameByLocalDB(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
-        println("get friend from localDB")
-        val sqlstr = "select * from friend_data where id = '$friendId'"
-        val cursor = fdb.rawQuery(sqlstr, null)
-        cursor.moveToPosition(-1)
-        while (cursor.moveToNext()) {
-            adapter?.add(UserProfileWithImageUrl(
-                    id = cursor.getString(0), // id
-                    name = cursor.getString(1), // name
-                    pathToFile = cursor.getString(2)
-            )) // created_atとupdated_atはdefault値．今後created_atとupdated_atが重要になってきたら変更しないといけない
-        }
+    private fun createGroup(users: ArrayList<UserProfileWithImageUrl>) {
+        val intent = Intent(this, ConfigureGroupActivity::class.java)
+        intent.putExtra("userId", userId)
+        intent.putExtra("userIds", users.map{it -> it.id}.toTypedArray())
+        intent.putExtra("userNames", users.map{it -> it.name}.toTypedArray())
+        intent.putExtra("userIcons", users.map{it -> it.pathToFile}.toTypedArray())
+        startActivityForResult(intent, REQUEST_CREATE_GROUP)
     }
 
-    private fun createGroup(userIds: ArrayList<String>) {
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_CREATE_GROUP && resultCode == RESULT_OK) {
+            finish()
+        }
     }
 }
