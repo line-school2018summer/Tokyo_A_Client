@@ -12,8 +12,8 @@ interface TalkService {
     fun getAllTalk(): Single<List<Talk>>
 
     @GET("/talk/{roomId}/{sinceTalkId}")
-    fun getTalk(@Path("roomId") roomId: Long, @Path("sinceTalkId") sinceTalkId: Long): Single<List<Talk>>
+    fun getTalk(@Path("roomId") roomId: String, @Path("sinceTalkId") sinceTalkId: Long): Single<List<Talk>>
 
     @POST("/talk/create/{senderId}/{roomId}/{text}")
-    fun addTalk(@Path("senderId") senderId: String, @Path("roomId") roomId: Long, @Path("text") text: String): Completable
+    fun addTalk(@Path("senderId") senderId: String, @Path("roomId") roomId: String, @Path("text") text: String): Completable
 }

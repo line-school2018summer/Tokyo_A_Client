@@ -26,7 +26,7 @@ import kotlin.concurrent.schedule
 class TalkActivity : AppCompatActivity() {
 
     private var userId: String = "default"
-    private var roomId: Long = -1
+    private var roomId: String = "room0"
     private var sinceTalkId: Long = -1
     private lateinit var talkList: ListView
     private var adapter: TalkAdapter? = null
@@ -50,7 +50,7 @@ class TalkActivity : AppCompatActivity() {
 
         (findViewById(R.id.roomName) as TextView).text = intent.getStringExtra("roomName")
         userId = intent.getStringExtra("userId")
-        roomId = intent.getStringExtra("roomId").toLong()
+        roomId = intent.getStringExtra("roomId")
 
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         mainLayout = findViewById(R.id.main_layout) as ConstraintLayout
