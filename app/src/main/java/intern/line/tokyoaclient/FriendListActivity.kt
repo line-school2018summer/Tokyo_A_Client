@@ -102,4 +102,24 @@ class FriendListActivity : AppCompatActivity() {
         intent.putExtra("roomId", roomId.toString())
         startActivity(intent)
     }
-}
+
+
+    topBtn.setOnClickListener()
+    {
+        fun onClick(View v) {
+            sc.post(fun Runnable ()) {
+
+                @Override
+                fun run() {
+                    sc.post(Runnable()) {
+                         fun run(){
+                            sc.fullScroll(ScrollView.FOCUS_UP);
+                        }
+                    }
+                }
+            }
+        }
+        }
+    }
+
+        }
