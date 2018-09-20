@@ -27,8 +27,10 @@ import kotlin.collections.ArrayList
 
 class FriendListFragment : Fragment() {
     private lateinit var userId: String
-    private lateinit var data: ArrayList<UserProfileWithImageUrl>
-    private var adapter: UserListAdapterWithImage? = null
+    private lateinit var friendData: ArrayList<UserProfileWithImageUrl>
+    private var friendAdapter: UserListAdapterWithImage? = null
+    private lateinit var groupData: ArrayList<UserProfileWithImageUrl>
+    private var groupAdapter: UserListAdapterWithImage? = null
     // localDB
     private lateinit var fdb: SQLiteDatabase
     private lateinit var friendHelper: FriendDBHelper
@@ -73,17 +75,22 @@ class FriendListFragment : Fragment() {
         getOwnIcon(userId)
 
         // フレンドの取得
-        data = ArrayList()
-        adapter = UserListAdapterWithImage(context!!, data)
+        friendData = ArrayList()
+        friendAdapter = UserListAdapterWithImage(context!!, friendData)
+        groupData = ArrayList()
+        groupAdapter = UserListAdapterWithImage(context!!, groupData)
         if (USE_LOCAL_DB) {
             getFriendByLocalDB()
+            getGroupByLocalDB()
         } else {
             getFriend(userId)
+            getGroup(userId)
         }
     }
 
     private lateinit var v: View
     private lateinit var friendList: ListView
+    private lateinit var groupList: ListView
     private lateinit var addFriendButton: Button
     private lateinit var createGroupButton: Button
     private lateinit var userIconImageView: ImageView
@@ -96,11 +103,13 @@ class FriendListFragment : Fragment() {
         addFriendButton = v.findViewById(R.id.addFriendButton) as Button
         createGroupButton = v.findViewById(R.id.createGroupButton) as Button
         friendList = v.findViewById(R.id.friendList) as ListView
+        groupList = v.findViewById(R.id.groupList) as ListView
         userIconImageView = v.findViewById(R.id.icon) as ImageView
 
         getOwnName(userId)
         getOwnIcon(userId)
-        friendList.setAdapter(adapter)
+        friendList.adapter = friendAdapter
+        groupList.adapter = groupAdapter
 
         addFriendButton.setOnClickListener {
             goToAddFriend(userId)
@@ -115,6 +124,10 @@ class FriendListFragment : Fragment() {
             val roomId: String = (num1 + num2).toString()
             // val roomId: String = UUID.randomUUID().toString()
             addMemberToRoomAfterCreateRoom(userId, friendId, roomId)
+            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
+        }
+        groupList.setOnItemClickListener { _, view, _, _ ->
+            val roomId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
         }
         return v
@@ -157,18 +170,34 @@ class FriendListFragment : Fragment() {
     }
 
     private fun getFriendByLocalDB() {
-        adapter?.clear() // 空にする
+        friendAdapter?.clear() // 空にする
         FriendLocalDBService().getAllFriend(fdb, context) {
-            adapter?.add(UserProfileWithImageUrl(
+            friendAdapter?.add(UserProfileWithImageUrl(
                     id = it.getString(0),
                     name = it.getString(1),
                     pathToFile = it.getString(2)))
+            Collections.sort(friendData, NameComparator())
+
         }
-        adapter?.notifyDataSetChanged()
+        friendAdapter?.notifyDataSetChanged()
+    }
+
+    private fun getGroupByLocalDB() {
+        groupAdapter?.clear()
+        RoomLocalDBService().getAllRoom(rdb, context) {
+            if (it.getInt(4) == 1) { // isGroup
+                groupAdapter?.add(UserProfileWithImageUrl(
+                        id = it.getString(0),
+                        name = it.getString(1),
+                        pathToFile = it.getString(2)))
+                Collections.sort(groupData, NameComparator())
+            }
+        }
+        groupAdapter?.notifyDataSetChanged()
     }
 
     private fun getFriend(userId: String) {
-        adapter?.clear()
+        friendAdapter?.clear()
         friendService.getFriendById(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -198,15 +227,58 @@ class FriendListFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.pathToFile != "") {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
+                        friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
                     } else {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                        friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
                     }
-                    Collections.sort(data, NameComparator())
+                    Collections.sort(friendData, NameComparator())
                 }, {
                     debugLog(context, "get image url failed: $it")
-                    adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
-                    Collections.sort(data, NameComparator())
+                    friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                    Collections.sort(friendData, NameComparator())
+                })
+    }
+
+    private fun getGroup(idStr: String) {
+        roomService.getRoomsByUserId(idStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    for(r in it) {
+                        getRoomName(r.roomId)
+                    }
+                }, {
+                    debugLog(context, "get room failed: $it")
+                })
+    }
+
+    private fun getRoomName(roomId: String) {
+        roomService.getRoomByRoomId(roomId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if(it.isGroup) {
+                        getRoomIcon(roomId, it.roomName)
+                    }
+                }, {
+                })
+    }
+
+    private fun getRoomIcon(roomId: String, roomName: String) {
+        imageService.getImageUrlById(roomId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (it.pathToFile != "") {
+                        groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, it.pathToFile))
+                    } else {
+                        groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
+                    }
+                    Collections.sort(groupData, NameComparator())
+                }, {
+                    debugLog(context, "get image url failed: $it")
+                    groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
+                    Collections.sort(groupData, NameComparator())
                 })
     }
 
@@ -248,7 +320,7 @@ class FriendListFragment : Fragment() {
                     RoomLocalDBService().getRoomById(roomId, rdb, context) {
                         if(it.count == 0) { // ルームがまだ存在していなければ
                             // ルームのlocalDBへの保存
-                            val member = data.find { it.id.equals(friendId) }
+                            val member = friendData.find { it.id.equals(friendId) }
                             if(member != null) {
                                 RoomLocalDBService().addRoom(
                                         roomId,
