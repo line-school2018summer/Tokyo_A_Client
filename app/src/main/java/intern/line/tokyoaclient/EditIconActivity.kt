@@ -25,7 +25,6 @@ import java.io.IOException
 class EditIconActivity : AppCompatActivity() {
 
     private val RESULT_PICK_IMAGEFILE = 1001
-    private lateinit var userName: String
     private lateinit var userId: String
     private lateinit var imageView: ImageView
     private var bmp: Bitmap? = null
@@ -34,7 +33,6 @@ class EditIconActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_icon)
 
-        userName = intent.getStringExtra("userName")
         userId = intent.getStringExtra("userId")
         imageView = findViewById(R.id.imageView) as ImageView
 

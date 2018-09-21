@@ -116,6 +116,7 @@ class SettingFragment : Fragment() {
         SelfInfoLocalDBService().getInfo(sdb) {
             it.moveToNext()
             (v.findViewById(R.id.userName) as TextView).text = it.getString(1)
+            userName = it.getString(1)
             Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.getString(2)).into(editIcon)
         }
     }
@@ -130,7 +131,6 @@ class SettingFragment : Fragment() {
     private fun goIconEdit() {
         var intent = Intent(context, EditIconActivity::class.java)
         intent.putExtra("userId", userId)
-        intent.putExtra("userName", userName)
         startActivity(intent)
     }
 }
