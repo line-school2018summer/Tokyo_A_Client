@@ -2,6 +2,7 @@ package intern.line.tokyoaclient
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import intern.line.tokyoaclient.Adapter.MyPagerAdapter
 import kotlinx.android.synthetic.main.activity_tab_layout.*
 
 class TabLayoutActivity : AppCompatActivity() {

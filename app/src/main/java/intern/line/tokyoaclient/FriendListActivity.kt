@@ -4,9 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.*
+import intern.line.tokyoaclient.Adapter.UserListAdapter
 import intern.line.tokyoaclient.HttpConnection.*
 import rx.android.schedulers.AndroidSchedulers
 import intern.line.tokyoaclient.HttpConnection.friendService
+import kotlinx.android.synthetic.main.fragment_friend_list.*
 import rx.schedulers.Schedulers
 import java.util.UUID
 
@@ -15,6 +17,7 @@ class FriendListActivity : AppCompatActivity() {
 
     private lateinit var friendList: ListView
     private lateinit var addFriendButton: Button
+    private lateinit var createGroupButton: Button
     private var adapter: UserListAdapter? = null
 
     private lateinit var userId: String
@@ -25,6 +28,7 @@ class FriendListActivity : AppCompatActivity() {
 
         userId = intent.getStringExtra("userId")
         addFriendButton = findViewById(R.id.addFriendButton) as Button
+        createGroupButton = findViewById(R.id.createGroupButton) as Button
         friendList = findViewById(R.id.friendList) as ListView
 
         adapter = UserListAdapter(this, ArrayList())
@@ -36,7 +40,10 @@ class FriendListActivity : AppCompatActivity() {
         addFriendButton.setOnClickListener {
             goToAddFriend(userId)
         }
-        friendList.setOnItemClickListener { adapterView, view, position, id ->
+        createGroupButton.setOnClickListener {
+            goToCreateGroup(userId)
+        }
+        friendList.setOnItemClickListener { _, view, _, _ ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
@@ -92,6 +99,12 @@ class FriendListActivity : AppCompatActivity() {
 
     private fun goToAddFriend(userId: String) {
         val intent = Intent(this, AddFriendActivity::class.java)
+        intent.putExtra("userId", userId)
+        startActivity(intent)
+    }
+
+    private fun goToCreateGroup(userId: String) {
+        val intent = Intent(this, CreateGroupActivity::class.java)
         intent.putExtra("userId", userId)
         startActivity(intent)
     }

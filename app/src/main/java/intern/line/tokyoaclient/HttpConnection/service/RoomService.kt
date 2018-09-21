@@ -12,10 +12,13 @@ interface RoomService {
     fun getAllRoom(): Single<List<Room>>
 
     @GET("/room/room_id/{room_id}")
-    fun findByRoomId(@Path("room_id") roomId: String): Single<Room>
+    fun getRoomByRoomId(@Path("room_id") roomId: String): Single<Room>
 
     @POST("/room/create/{room_id}/{room_name}")
     fun addRoom(@Path("room_id") roomId: String, @Path("room_name") roomName: String): Completable
+
+    @POST("/room/create_group/{room_id}/{room_name}")
+    fun addRoomAsGroup(@Path("room_id") roomId: String, @Path("room_name") roomName: String): Completable
 
     @PUT("/room/modify/{room_id}/{room_name}")
     fun modifyroom(@Path("room_id") roomId: String, @Path("room_name") roomName: String): Completable

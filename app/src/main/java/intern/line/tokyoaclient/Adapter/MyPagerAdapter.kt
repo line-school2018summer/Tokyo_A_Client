@@ -1,9 +1,12 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Adapter
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import intern.line.tokyoaclient.Fragment.FriendListFragment
+import intern.line.tokyoaclient.Fragment.SettingFragment
+import intern.line.tokyoaclient.Fragment.TalkListFragment
 
 class MyPagerAdapter(fm: FragmentManager, uid: String) : FragmentPagerAdapter(fm) {
     val bundle = Bundle()
@@ -38,9 +41,7 @@ class MyPagerAdapter(fm: FragmentManager, uid: String) : FragmentPagerAdapter(fm
         return when (position) {
             0 -> "Friend List"
             1 -> "Talk List"
-            else -> {
-                return "Settings"
-            }
+            else -> "Settings"
         }
     }
 }

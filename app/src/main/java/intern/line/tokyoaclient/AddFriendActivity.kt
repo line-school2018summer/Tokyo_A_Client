@@ -1,7 +1,6 @@
 package intern.line.tokyoaclient
 
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
@@ -14,10 +13,17 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import android.widget.Toast
 import android.widget.TextView
+import intern.line.tokyoaclient.Adapter.NameComparator
+import intern.line.tokyoaclient.Adapter.UserListAdapterWithImage
 import intern.line.tokyoaclient.HttpConnection.friendService
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
+import intern.line.tokyoaclient.HttpConnection.roomService
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
+import intern.line.tokyoaclient.LocalDataBase.FriendLocalDBService
+import intern.line.tokyoaclient.LocalDataBase.RoomDBHelper
+import intern.line.tokyoaclient.LocalDataBase.RoomLocalDBService
+import java.sql.Timestamp
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -35,7 +41,9 @@ class AddFriendActivity : AppCompatActivity() {
     private lateinit var friendIdData: ArrayList<String>
     // localDB
     private lateinit var fdb: SQLiteDatabase
-    private lateinit var helper: FriendDBHelper
+    private lateinit var friendHelper: FriendDBHelper
+    private lateinit var rdb: SQLiteDatabase
+    private lateinit var roomHelper: RoomDBHelper
 
     private lateinit var userId: String
 
@@ -60,42 +68,44 @@ class AddFriendActivity : AppCompatActivity() {
 
         if(USE_LOCAL_DB) {
             try {
-                helper = FriendDBHelper(this)
+                friendHelper = FriendDBHelper(this)
+                roomHelper = RoomDBHelper(this)
             } catch (e: SQLiteException) {
-                Toast.makeText(this, "helper error: ${e.toString()}", Toast.LENGTH_SHORT).show()
-                println("helper error: ${e.toString()}")
+                debugLog(this, "helper error: ${e.toString()}")
             }
 
-
             try {
-                fdb = helper.writableDatabase
+                fdb = friendHelper.writableDatabase
+                rdb = roomHelper.writableDatabase
                 Toast.makeText(this, "accessed to database", Toast.LENGTH_SHORT).show()
             } catch (e: SQLiteException) {
-                Toast.makeText(this, "writable error: ${e.toString()}", Toast.LENGTH_SHORT).show()
-                println("writable error: ${e.toString()}")
+                debugLog(this, "writable error: ${e.toString()}")
             }
         }
 
-        getFriend(userId)
+        if(USE_LOCAL_DB)
+            getFriendByLocalDB()
+        else
+            getFriend(userId)
 
         searchFriendButton.setOnClickListener {
             searchFriend()
         }
-        alreadyFriendList.setOnItemClickListener { adapterView, view, position, id ->
+        alreadyFriendList.setOnItemClickListener { _, view, _, _ ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
-            val roomId: Int = num1 + num2
+            val roomId: String = (num1 + num2).toString()
+            addMemberToRoomAfterCreateRoom(userId, friendId, roomId)
             goToTalk(roomId, friendName)
         }
-        searchFriendResultList.setOnItemClickListener { adapterView, view, position, id ->
+        searchFriendResultList.setOnItemClickListener { _, view, position, _ ->
             val friendId = view.findViewById<TextView>(R.id.idTextView).text.toString()
             val friendName = view.findViewById<TextView>(R.id.nameTextView).text.toString()
             val pathToFile = newFriendData[position].pathToFile
-            if(USE_LOCAL_DB) {
+            if(USE_LOCAL_DB)
                 addFriendToLocalDB(friendId, friendName, pathToFile) // 本来ならaddFriendの中でDBへの書き込みの成功が確認できてからlocalDBに追加するべき
-            }
             addFriend(userId, friendId, friendName)
         }
     }
@@ -108,17 +118,20 @@ class AddFriendActivity : AppCompatActivity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    private fun getFriendByLocalDB() {
+        FriendLocalDBService().getAllFriend(fdb, this) {
+            friendIdData.add(it.getString(0))
+        }
+    }
+
     private fun getFriend(userId: String) {
         friendService.getFriendById(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     friendIdData.addAll(it.map{friend ->  friend.friendId})
-                    // Toast.makeText(context, "get friend list succeeded", Toast.LENGTH_SHORT).show()
-                    // println("get friend list succeeded: $it")
                 }, {
-                    Toast.makeText(this, "get friend list failed: $it", Toast.LENGTH_LONG).show()
-                    println("get friend list failed: $it")
+                    debugLog(this, "get friend list failed: $it")
                 })
     }
 
@@ -131,31 +144,25 @@ class AddFriendActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     for (u in it) {
-                        if(u.id in friendIdData) {
+                        if(u.id in friendIdData) { // すでにフレンドに登録されていればalreadyFriendDataに，登録されていなければnewFriendDataに追加
                             getFriendName(u.id, alreadyFriendData, alreadyFriendAdapter)
                         } else {
                             getFriendName(u.id, newFriendData, newFriendAdapter)
                         }
                     }
-                    // Toast.makeText(this, "search friend succeeded", Toast.LENGTH_SHORT).show()
-                    // println("search friend succeeded: $it")
                 }, {
-                    Toast.makeText(this, "search friend failed: $it", Toast.LENGTH_LONG).show()
-                    println("search friend failed: $it")
+                    debugLog(this, "search friend failed: $it")
                 })
     }
 
-    private fun getFriendName(friendId: String, data: ArrayList<UserProfileWithImageUrl>, adapter: UserListAdapterWithImage?) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    private fun getFriendName(friendId: String, data: ArrayList<UserProfileWithImageUrl>, adapter: UserListAdapterWithImage?) {
         userProfileService.getUserById(friendId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    // Toast.makeText(this, "get name succeeded", Toast.LENGTH_SHORT).show()
-                    // println("get name succeeded: $it")
                     getIcon(it.id, it.name, data, adapter)
                 }, {
-                    Toast.makeText(this, "get name failed: $it", Toast.LENGTH_LONG).show()
-                    println("get name failed: $it")
+                    debugLog(this, "get name failed: $it")
                 })
     }
 
@@ -164,8 +171,6 @@ class AddFriendActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    // Toast.makeText(this, "get image url succeeded: $it", Toast.LENGTH_SHORT).show()
-                    // println("get image url succeeded: $it")
                     if (it.pathToFile != "") {
                         adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
                     } else {
@@ -173,11 +178,14 @@ class AddFriendActivity : AppCompatActivity() {
                     }
                     Collections.sort(data, NameComparator())
                 }, {
+                    debugLog(this, "get image url failed: $it")
                     adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
                     Collections.sort(data, NameComparator())
-                    Toast.makeText(this, "get image url failed: $it", Toast.LENGTH_LONG).show()
-                    println("get image url failed: $it")
                 })
+    }
+
+    private fun addFriendToLocalDB(friendId: String, friendName: String, pathToFile: String) {
+        FriendLocalDBService().addFriend(friendId, friendName, pathToFile, fdb, this)
     }
 
     private fun addFriend(userId: String, friendId: String, friendName: String) {
@@ -186,52 +194,86 @@ class AddFriendActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     Toast.makeText(this, "$friendName をフレンドに追加しました！", Toast.LENGTH_SHORT).show()
-                    println("add friend succeeded")
                     // フレンド画面へのintent
                     var intent = Intent()
                     intent.putExtra("newFriendId", friendId)
                     setResult(Activity.RESULT_OK, intent)
                     finish()
                 }, {
-                    Toast.makeText(this, "add friend failed: $it", Toast.LENGTH_LONG).show()
-                    println("add friend failed: $it")
+                    debugLog(this, "add friend failed: $it")
                 })
     }
 
-    private fun addFriendToLocalDB(friendId: String, friendName: String, pathToFile: String) {
-        var value: ContentValues
-        var res: Long
-        println("add friend to localDB")
-
-        // フレンドのidの追加
-        value = ContentValues().also {
-            it.put("friend_id", friendId)
-        }
-        res = fdb.insert("friends", null, value)
-        if(res < 0) {
-            // error
-            Toast.makeText(this, "error in INSERT", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        value = ContentValues().also {
-            it.put("id", friendId)
-            it.put("name", friendName)
-            it.put("path_to_file", pathToFile)
-        }
-        res = fdb.insert("friend_data", null, value)
-        if(res < 0) {
-            // error
-            Toast.makeText(this, "error in INSERT", Toast.LENGTH_SHORT).show()
-            return
-        }
+    private fun addMemberToRoomAfterCreateRoom(userId: String, friendId: String, roomId: String) {
+        // ルームの登録
+        roomService.addRoom(roomId, "default_room")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    for(u in arrayListOf(userId, friendId)) {
+                        addMemberToRoom(u, roomId)
+                    }
+                    if(USE_LOCAL_DB)
+                        addGroupToLocalDB(userId, friendId, roomId, "default_room")
+                }, {
+                    debugLog(this, "add room failed: $it")
+                })
     }
 
-    private fun goToTalk(roomId: Int, name: String) {
+    private fun addMemberToRoom(userId: String, roomId: String) {
+        // ルームメンバー（自分とフレンド）の登録
+        roomService.addRoomMember(roomId, userId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                }, {
+                    Toast.makeText(this, "add room member failed: $it", Toast.LENGTH_LONG).show()
+                    println("add room member failed: $it")
+                })
+    }
+
+    private fun addGroupToLocalDB(userId: String, friendId: String, roomId: String, roomName: String) {
+        // ルームの情報を取得してから，localDBに保存
+        roomService.getRoomByRoomId(roomId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    val room = it
+                    RoomLocalDBService().getRoomById(roomId, rdb, this) {
+                        if(it.count == 0) { // ルームがまだ存在していなければ
+                            // ルームのlocalDBへの保存
+                            val member = alreadyFriendData.find { it.id.equals(friendId) }
+                            if(member != null) {
+                                RoomLocalDBService().addRoom(
+                                        roomId,
+                                        member.name,
+                                        member.pathToFile,
+                                        room.createdAt,
+                                        false,
+                                        -1,
+                                        "",
+                                        Timestamp(0L),
+                                        rdb, this)
+                            } else {
+                                debugLog(this, "something wrong in find member from data")
+                            }
+
+                            // ルームメンバーのlocalDBへの保存
+                            RoomLocalDBService().addRoomMembers(roomId, arrayListOf(userId, friendId), rdb, this)
+
+                            debugLog(this, "add room!")
+                        }
+                    }
+                }, {
+                    debugLog(this, "add room failed: $it")
+                })
+    }
+
+    private fun goToTalk(roomId: String, name: String) {
         val intent = Intent(this, TalkActivity::class.java)
         intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)
-        intent.putExtra("roomId", roomId.toString())
+        intent.putExtra("roomId", roomId)
         startActivity(intent)
         finish()
     }

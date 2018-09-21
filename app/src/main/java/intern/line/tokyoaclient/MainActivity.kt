@@ -16,7 +16,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
 
-public val USE_LOCAL_DB = false
+public var USE_LOCAL_DB = false
 
 class MainActivity : AppCompatActivity() {
     //firabaseauthオブジェクトとログインユーザーオブジェクトのインスタンスを作っておく
@@ -38,7 +38,6 @@ class MainActivity : AppCompatActivity() {
         //ボタンをゲットしておく
         val signUpButton = findViewById(R.id.signup) as Button
         val signInButton = findViewById(R.id.signin) as Button
-        val goButton = findViewById(R.id.goButton) as Button
 
         //それぞれのボタンが押されたときにメソッドを呼び出す
         signUpButton.setOnClickListener {
@@ -47,9 +46,12 @@ class MainActivity : AppCompatActivity() {
         signInButton.setOnClickListener {
             signIn()
         }
-        goButton.setOnClickListener {
-            // goTest()
-            golocalDBTest()
+
+        findViewById<Button>(R.id.localDBButton).setOnClickListener {
+            USE_LOCAL_DB = true
+        }
+        findViewById<Button>(R.id.noLocalDBButton).setOnClickListener {
+            USE_LOCAL_DB = false
         }
     }
 

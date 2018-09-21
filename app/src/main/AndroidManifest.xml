@@ -29,6 +29,8 @@
         <activity android:name=".localDBDebugActivity" />
         <activity android:name=".EditNameActivity" />
         <activity android:name=".EditIconActivity" />
+        <activity android:name=".CreateGroupActivity" />
+        <activity android:name=".ConfigureGroupActivity" />
     </application>
 
 </manifest>

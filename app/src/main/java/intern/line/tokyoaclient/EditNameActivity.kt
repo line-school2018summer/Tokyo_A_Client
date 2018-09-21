@@ -2,10 +2,12 @@ package intern.line.tokyoaclient
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+
 
 class EditNameActivity : AppCompatActivity() {
 
@@ -26,6 +28,14 @@ class EditNameActivity : AppCompatActivity() {
         applyButton.setOnClickListener {
             changeName(userId, (findViewById(R.id.nameText) as TextView).text.toString())
         }
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // 戻るボタンが押されたときの処理
+            finish()
+        }
+        return super.onKeyDown(keyCode, event)
     }
 
     private fun changeName(userId: String, newName: String){

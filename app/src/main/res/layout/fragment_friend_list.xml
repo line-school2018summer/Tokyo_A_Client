@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FriendListFragment">
+    tools:context=".Fragment.FriendListFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -28,40 +28,84 @@
             android:text="UserName"
             android:textSize="25sp"
             app:layout_constraintBottom_toBottomOf="@+id/icon"
-            app:layout_constraintEnd_toStartOf="@+id/addFriendButton"
+            app:layout_constraintEnd_toStartOf="@+id/createGroupButton"
             app:layout_constraintStart_toEndOf="@+id/icon"
             app:layout_constraintTop_toTopOf="@+id/icon" />
 
         <TextView
             android:id="@+id/friendListTextView"
-            android:layout_width="381dp"
+            android:layout_width="match_parent"
             android:layout_height="32dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="3dp"
             android:layout_marginEnd="2dp"
             android:layout_marginLeft="1dp"
             android:layout_marginRight="2dp"
             android:layout_marginStart="1dp"
-            android:text="Friend List"
+            android:text="ともだち"
             android:textSize="24sp"
-            app:layout_constraintBottom_toTopOf="@+id/friendList"
+            android:background="@color/colorPrimaryDark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ownNameText"
-            tools:text="Friend List" />
+            tools:text="ともだち" />
 
         <ListView
             android:id="@+id/friendList"
             android:layout_width="0dp"
-            android:layout_height="480dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_height="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/friendListTextView"
             app:layout_constraintVertical_bias="1.0" />
 
+        <TextView
+            android:id="@+id/groupListTextView"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginBottom="3dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginLeft="1dp"
+            android:layout_marginRight="2dp"
+            android:layout_marginStart="1dp"
+            android:text="グループ"
+            android:textSize="24sp"
+            android:background="@color/colorPrimaryDark"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/friendList"
+            tools:text="グループ" />
+
+        <ListView
+            android:id="@+id/groupList"
+            android:layout_width="0dp"
+            android:layout_height="200dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/groupListTextView"
+            app:layout_constraintVertical_bias="1.0" />
+
         <Button
             android:id="@+id/addFriendButton"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="1dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="🔎"
+            android:textSize="24sp"
+            app:layout_constraintBottom_toTopOf="@+id/ownNameText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/friendListTextView"
+            app:layout_constraintTop_toBottomOf="@+id/createGroupButton"
+            app:layout_constraintVertical_bias="0.019" />
+
+        <Button
+            android:id="@+id/createGroupButton"
             style="@style/Widget.AppCompat.Button.Small"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
@@ -76,6 +120,7 @@
             app:layout_constraintStart_toEndOf="@+id/friendListTextView"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.019" />
+
     </android.support.constraint.ConstraintLayout>
 
 
