@@ -12,6 +12,14 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/bg"
+            android:scaleType="centerCrop" />
 
         <ImageView
             android:id="@+id/icon"
