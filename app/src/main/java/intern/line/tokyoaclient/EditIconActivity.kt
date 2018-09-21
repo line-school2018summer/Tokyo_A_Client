@@ -35,7 +35,7 @@ class EditIconActivity : AppCompatActivity() {
     // localDB
     private lateinit var sdb: SQLiteDatabase
     private lateinit var selfInfoHelper: SelfInfoDBHelper
-    
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

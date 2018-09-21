@@ -37,7 +37,10 @@ class RoomAdapterWithImage(context: Context, rooms: List<RoomWithImageUrlAndLate
         val room = getItem(position) as RoomWithImageUrlAndLatestTalk
         holder.nameTextView.text = room.roomName
         holder.latestTalkTextView.text = room.latestTalk
-        holder.latestTalkTime.text = room.latestTalkTime.toString().substring(11, 16)
+        if(!room.latestTalkTime.equals(Timestamp(0L)))
+            holder.latestTalkTime.text = room.latestTalkTime.toString().substring(11, 16)
+        else
+            holder.latestTalkTime.text = "" // room.createdAt.toString().substring(11, 16)
         holder.pathToFile = room.pathToFile
         Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + room.pathToFile).into(holder.iconImageView)
         return view!!

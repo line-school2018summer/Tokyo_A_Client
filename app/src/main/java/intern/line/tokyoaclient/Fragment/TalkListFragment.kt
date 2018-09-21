@@ -124,13 +124,13 @@ class TalkListFragment : Fragment() {
             println("room number: ${it.count}")
             println("add room; roomId = ${it.getString(0)}\n")
             adapter?.add(RoomWithImageUrlAndLatestTalk(
-                    it.getString(0),
-                    it.getString(1),
-                    it.getString(2),
-                    it.getString(6),
-                    Timestamp.valueOf(it.getString(3)),
-                    it.getLong(5),
-                    Timestamp.valueOf(it.getString(7))
+                    it.getString(0), // roomId
+                    it.getString(1), // roomName
+                    it.getString(2), // pathToFile
+                    it.getString(6), // latestTalk
+                    Timestamp.valueOf(it.getString(7)), // latestTalkTime
+                    it.getLong(5), // sinceTalkId
+                    Timestamp.valueOf(it.getString(3)) // createdAt
             ))
         }
         adapter?.notifyDataSetChanged()
@@ -252,6 +252,7 @@ class TalkListFragment : Fragment() {
                         print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
                         adapter?.add(roomWithImageUrlAndLatestTalk)
                         Collections.sort(data, RoomComparator())
+                        adapter?.notifyDataSetChanged()
 
                         if(USE_LOCAL_DB) {
                             RoomLocalDBService().addRoom(it.roomId,
@@ -326,6 +327,7 @@ class TalkListFragment : Fragment() {
                     print("(2) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
                     adapter?.add(roomWithImageUrlAndLatestTalk)
                     Collections.sort(data, RoomComparator())
+                    adapter?.notifyDataSetChanged()
 
                     if(USE_LOCAL_DB) {
                         RoomLocalDBService().addRoom(roomWithImageUrlAndLatestTalk.roomId,
