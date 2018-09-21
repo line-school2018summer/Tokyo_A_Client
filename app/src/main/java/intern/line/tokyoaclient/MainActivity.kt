@@ -16,7 +16,7 @@ import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
 
-public var USE_LOCAL_DB = false
+public var USE_LOCAL_DB = true
 
 class MainActivity : AppCompatActivity() {
     //firabaseauthオブジェクトとログインユーザーオブジェクトのインスタンスを作っておく

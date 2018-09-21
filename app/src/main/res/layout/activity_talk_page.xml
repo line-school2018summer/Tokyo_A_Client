@@ -36,8 +36,17 @@
         android:id="@+id/sendButton"
         android:layout_width="80dp"
         android:layout_height="50dp"
-        android:hint="送信"
+        android:text="送信"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        android:id="@+id/addMemberButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text="+"
+        android:textSize="20sp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

@@ -1,6 +1,7 @@
 package intern.line.tokyoaclient
 
 import android.content.Context
+import android.content.Intent
 import android.database.CursorIndexOutOfBoundsException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
@@ -9,6 +10,7 @@ import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import intern.line.tokyoaclient.Adapter.TalkAdapter
@@ -20,6 +22,8 @@ import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.Talk
 import intern.line.tokyoaclient.HttpConnection.model.TalkWithImageUrl
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
+import intern.line.tokyoaclient.HttpConnection.roomService
+import intern.line.tokyoaclient.HttpConnection.service.UserProfileService
 import intern.line.tokyoaclient.HttpConnection.talkService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.*
@@ -32,11 +36,14 @@ class TalkActivity : AppCompatActivity() {
 
     private var userId: String = "default"
     private var roomId: String = "room0"
+    private var isGroup: Boolean = false
     private var sinceTalkId: Long = -1
     private lateinit var talkList: ListView
     private var adapter: TalkAdapter? = null
     private lateinit var data: ArrayList<TalkWithImageUrl>
     private var alive = true
+
+    private var REQUEST_ADD_MEMBER = 1001
 
     // キーボード表示を制御するためのオブジェクト
     private lateinit var inputMethodManager: InputMethodManager
@@ -89,6 +96,8 @@ class TalkActivity : AppCompatActivity() {
         (findViewById(R.id.roomName) as TextView).text = intent.getStringExtra("roomName")
         userId = intent.getStringExtra("userId")
         roomId = intent.getStringExtra("roomId")
+        isGroup = intent.getBooleanExtra("isGroup", false)
+        debugLog(this, "isGroup: $isGroup")
 
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         mainLayout = findViewById(R.id.main_layout) as ConstraintLayout
@@ -96,29 +105,45 @@ class TalkActivity : AppCompatActivity() {
         if(USE_LOCAL_DB) { // 使うユーザの情報を確保しておく
             RoomLocalDBService().getRoomMembers(roomId, rdb, this) {
                 while(it.moveToNext()) {
+                    val uid = it.getString(1)
                     FriendLocalDBService().getFriend(it.getString(1), fdb, this) {
                         try {
                             it.moveToNext()
-                            roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2))) // TODO: バグあり
+                            roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
                         } catch (e: CursorIndexOutOfBoundsException) {
                             // フレンドで見つからなかったらそれは自分
                             SelfInfoLocalDBService().getInfo(sdb) {
-                                if(it.moveToNext())
+                                try {
+                                    it.moveToNext()
                                     roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
+                                } catch (e: CursorIndexOutOfBoundsException) { // 自分でもなかったらフレンドではない，知らない人
+                                    getUserInfo(uid)
+                                }
                             }
                         }
                     }
                 }
             }
+            getMember()
         } else { // TODO
+            getMember()
         }
 
         //ボタンをゲットしておく
         val sendButton = findViewById(R.id.sendButton) as Button
+        val addMemberButton = findViewById(R.id.addMemberButton) as Button
+        if(isGroup)
+            addMemberButton.visibility = View.VISIBLE
+        else
+            addMemberButton.visibility = View.INVISIBLE
 
         //それぞれのボタンが押されたときにメソッドを呼び出す
         sendButton.setOnClickListener {
             sendMessage()
+        }
+
+        addMemberButton.setOnClickListener {
+            goAddMember()
         }
 
         if(USE_LOCAL_DB) {
@@ -161,6 +186,21 @@ class TalkActivity : AppCompatActivity() {
         inputMethodManager.hideSoftInputFromWindow(mainLayout.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
         // 背景にフォーカスを移す
         mainLayout.requestFocus()
+    }
+
+    private fun getMember() {
+        roomService.getRoomMembersByRoomId(roomId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    for(rm in it) {
+                        val target = roomMemberList.find{ it.id.equals(rm.uid) }
+                        if(target == null)
+                            getUserInfo(rm.uid)
+                    }
+                }, {
+                    debugLog(this, "get room member failed: $it")
+                })
     }
 
     private fun sendMessage() {
@@ -226,7 +266,8 @@ class TalkActivity : AppCompatActivity() {
                                 addMessageUsingMemberList(t)
                                 addMessageToLocalDB(t) // トークを更新
                             } else {
-                                getSendersName(t)
+                                addMessageUsingMemberList(t)
+                                // getSendersName(t)
                             }
                         }
                     }
@@ -296,5 +337,51 @@ class TalkActivity : AppCompatActivity() {
                 }, {
                     debugLog(this, "get image url failed: $it")
                 })
+    }
+
+    private fun getUserInfo(uid: String) {
+        userProfileService.getUserById(uid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    getImageUrl(uid, it.name)
+                }, {
+                    debugLog(this, "get user failed: $it")
+                })
+    }
+
+    private fun getImageUrl(uid: String, name: String) {
+        imageService.getImageUrlById(uid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    roomMemberList.add(UserProfileWithImageUrl(uid, name, it.pathToFile))
+                }, {
+                    debugLog(this, "get image url failed: $it")
+                })
+    }
+
+    private fun goAddMember() {
+        val intent = Intent(this, AddMemberActivity::class.java)
+        intent.putExtra("userId", userId)
+        intent.putExtra("roomId", roomId)
+        startActivityForResult(intent, REQUEST_ADD_MEMBER)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode == REQUEST_ADD_MEMBER && resultCode == RESULT_OK) {
+            if(data != null) {
+                Toast.makeText(this, data.getStringExtra("addMemberMessage"), Toast.LENGTH_SHORT).show()
+                var addMemberIds = data.getStringArrayListExtra("addMemberIds")
+                if(USE_LOCAL_DB) {
+                    for (m in addMemberIds) {
+                        FriendLocalDBService().getFriend(m, fdb, this) {
+                            while (it.moveToNext())
+                                roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
+                        }
+                    }
+                }
+            }
+        }
     }
 }

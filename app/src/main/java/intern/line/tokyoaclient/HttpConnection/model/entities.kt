@@ -73,5 +73,6 @@ data class RoomWithImageUrlAndLatestTalk(
         var latestTalk: String = "hoge",
         var latestTalkTime: Timestamp = Timestamp(0L),
         var sinceTalkId: Long = -1,
-        var createdAt: Timestamp = Timestamp(0L)
+        var createdAt: Timestamp = Timestamp(0L),
+        var isGroup: Boolean = false
 )
