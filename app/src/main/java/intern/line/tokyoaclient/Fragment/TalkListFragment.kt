@@ -96,7 +96,7 @@ class TalkListFragment : Fragment() {
 
         roomList.setOnItemClickListener { _, _, position, _ ->
             val roomId: String = data[position].roomId
-            goToTalk(roomId, data[position].roomName)
+            goToTalk(roomId, data[position].roomName, data[position].isGroup)
         }
 
         return v
@@ -124,13 +124,14 @@ class TalkListFragment : Fragment() {
             println("room number: ${it.count}")
             println("add room; roomId = ${it.getString(0)}\n")
             adapter?.add(RoomWithImageUrlAndLatestTalk(
-                    it.getString(0),
-                    it.getString(1),
-                    it.getString(2),
-                    it.getString(6),
-                    Timestamp.valueOf(it.getString(3)),
-                    it.getLong(5),
-                    Timestamp.valueOf(it.getString(7))
+                    it.getString(0), // roomId
+                    it.getString(1), // roomName
+                    it.getString(2), // pathToFile
+                    it.getString(6), // latestTalk
+                    Timestamp.valueOf(it.getString(7)), // latestTalkTime
+                    it.getLong(5), // sinceTalkId
+                    Timestamp.valueOf(it.getString(3)), // createdAt
+                    if(it.getString(4).equals("1")) true else false // isGroup
             ))
         }
         adapter?.notifyDataSetChanged()
@@ -246,12 +247,14 @@ class TalkListFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if(it.isGroup) { // グループ
+                        roomWithImageUrlAndLatestTalk.isGroup = true
                         roomWithImageUrlAndLatestTalk.createdAt = it.createdAt
                         roomWithImageUrlAndLatestTalk.roomName = it.roomName
                         roomWithImageUrlAndLatestTalk.pathToFile = "default.jpg"
                         print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
                         adapter?.add(roomWithImageUrlAndLatestTalk)
                         Collections.sort(data, RoomComparator())
+                        adapter?.notifyDataSetChanged()
 
                         if(USE_LOCAL_DB) {
                             RoomLocalDBService().addRoom(it.roomId,
@@ -266,6 +269,7 @@ class TalkListFragment : Fragment() {
                             debugLog(context, "added room to localDB: roomid is ${it.roomId}")
                         }
                     } else { // 個人チャット
+                        roomWithImageUrlAndLatestTalk.isGroup = false
                         getMembers(roomWithImageUrlAndLatestTalk, sinceTalkId)
                     }
                 }, {
@@ -326,6 +330,7 @@ class TalkListFragment : Fragment() {
                     print("(2) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
                     adapter?.add(roomWithImageUrlAndLatestTalk)
                     Collections.sort(data, RoomComparator())
+                    adapter?.notifyDataSetChanged()
 
                     if(USE_LOCAL_DB) {
                         RoomLocalDBService().addRoom(roomWithImageUrlAndLatestTalk.roomId,
@@ -344,11 +349,12 @@ class TalkListFragment : Fragment() {
                 })
     }
 
-    private fun goToTalk(roomId: String, name: String) {
+    private fun goToTalk(roomId: String, name: String, isGroup: Boolean) {
         val intent = Intent(context, TalkActivity::class.java)
         intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)
-        intent.putExtra("roomId", roomId.toString())
+        intent.putExtra("roomId", roomId)
+        intent.putExtra("isGroup", isGroup)
         startActivity(intent)
     }
 }

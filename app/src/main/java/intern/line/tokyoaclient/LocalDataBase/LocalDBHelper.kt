@@ -57,6 +57,20 @@ class SelfInfoLocalDBService {
         }
         sdb.update("info", value, "id=?", arrayOf(id))
     }
+
+    fun updateNameInfo(id: String, name: String, sdb: SQLiteDatabase) {
+        val value: ContentValues = ContentValues().also {
+            it.put("name", name)
+        }
+        sdb.update("info", value, "id=?", arrayOf(id))
+    }
+
+    fun updatePathToFileInfo(id: String, pathToFile: String, sdb: SQLiteDatabase) {
+        val value: ContentValues = ContentValues().also {
+            it.put("path_to_file", pathToFile)
+        }
+        sdb.update("info", value, "id=?", arrayOf(id))
+    }
 }
 
 

@@ -2,6 +2,8 @@ package intern.line.tokyoaclient
 
 import android.app.Activity
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -11,6 +13,8 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.imageService
+import intern.line.tokyoaclient.LocalDataBase.SelfInfoDBHelper
+import intern.line.tokyoaclient.LocalDataBase.SelfInfoLocalDBService
 import kotlinx.android.synthetic.main.activity_edit_icon.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -28,6 +32,10 @@ class EditIconActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var imageView: ImageView
     private var bmp: Bitmap? = null
+    // localDB
+    private lateinit var sdb: SQLiteDatabase
+    private lateinit var selfInfoHelper: SelfInfoDBHelper
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +43,23 @@ class EditIconActivity : AppCompatActivity() {
 
         userId = intent.getStringExtra("userId")
         imageView = findViewById(R.id.imageView) as ImageView
+
+        if (USE_LOCAL_DB) {
+            try {
+                selfInfoHelper = SelfInfoDBHelper(this)
+            } catch (e: SQLiteException) {
+                debugLog(this, "helper error: ${e.toString()}")
+            }
+
+            try {
+                sdb = selfInfoHelper.writableDatabase
+                Toast.makeText(this, "accessed to database", Toast.LENGTH_SHORT).show()
+            } catch (e: SQLiteException) {
+                debugLog(this, "writable error: ${e.toString()}")
+            }
+        } else {
+            this.deleteDatabase(SelfInfoDBHelper(this).databaseName)
+        }
 
         //ボタンをゲットしておく
         val goToGalleryButton = findViewById(R.id.goToGallery) as Button
@@ -106,16 +131,26 @@ class EditIconActivity : AppCompatActivity() {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe({
-                        Toast.makeText(this, "put image succeeded", Toast.LENGTH_SHORT).show()
-                        println("put image succeeded")
+                        if(USE_LOCAL_DB)
+                            updateIconLocalDB()
                         finish()
                     }, {
-                        Toast.makeText(this, "put image failed: $it", Toast.LENGTH_SHORT).show()
-                        println("put image failed: $it")
+                        debugLog(this, "put image failed: $it")
                     })
         } catch (e: IOException) {
             e.printStackTrace()
         }
+    }
+
+    fun updateIconLocalDB() {
+        imageService.getImageUrlById(userId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        SelfInfoLocalDBService().updatePathToFileInfo(userId, it.pathToFile, sdb)
+                    }, {
+
+                    })
     }
 
     private fun bitmapToByteArray (bitmap: Bitmap?): ByteArray {

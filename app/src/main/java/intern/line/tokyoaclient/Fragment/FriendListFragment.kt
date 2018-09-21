@@ -124,11 +124,11 @@ class FriendListFragment : Fragment() {
             val roomId: String = (num1 + num2).toString()
             // val roomId: String = UUID.randomUUID().toString()
             addMemberToRoomAfterCreateRoom(userId, friendId, roomId)
-            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
+            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString(), false)
         }
         groupList.setOnItemClickListener { _, view, _, _ ->
             val roomId = view.findViewById<TextView>(R.id.idTextView).text.toString()
-            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString())
+            goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString(), true)
         }
         return v
     }
@@ -353,11 +353,12 @@ class FriendListFragment : Fragment() {
         startActivityForResult(intent, REQUEST_ADD_FRIEND)
     }
 
-    private fun goToTalk(roomId: String, name: String) {
+    private fun goToTalk(roomId: String, name: String, isGroup: Boolean) {
         val intent = Intent(context, TalkActivity::class.java)
         intent.putExtra("roomName", name)
         intent.putExtra("userId", userId)
-        intent.putExtra("roomId", roomId.toString())
+        intent.putExtra("roomId", roomId)
+        intent.putExtra("isGroup", isGroup)
         startActivity(intent)
     }
 
