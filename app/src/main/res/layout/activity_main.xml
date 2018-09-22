@@ -18,7 +18,7 @@
         android:layout_marginStart="85dp"
         android:layout_marginTop="18dp"
         android:ems="10"
-        android:hint="(Name if you sign up)"
+        android:hint="サインアップ名前"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/signin"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,7 +36,7 @@
         android:layout_marginStart="85dp"
         android:layout_marginTop="26dp"
         android:ems="10"
-        android:hint="Password"
+        android:hint="パスワード"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/nameText"
         app:layout_constraintEnd_toEndOf="parent"
@@ -52,7 +52,7 @@
         android:layout_marginLeft="148dp"
         android:layout_marginRight="148dp"
         android:layout_marginStart="148dp"
-        android:text="sign in"
+        android:text="サインイン"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -67,7 +67,7 @@
         android:layout_marginRight="148dp"
         android:layout_marginStart="148dp"
         android:layout_marginTop="29dp"
-        android:text="sign up"
+        android:text="サインアップ"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -84,7 +84,7 @@
         android:layout_marginStart="85dp"
         android:layout_marginTop="44dp"
         android:ems="10"
-        android:hint="Email"
+        android:hint="メール"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/passwordText"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,7 +95,7 @@
         android:id="@+id/localDBButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="use localDB"
+        android:text="ローカルデータベース使用"
         app:layout_constraintBottom_toTopOf="@+id/noLocalDBButton"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -103,7 +103,7 @@
         android:id="@+id/noLocalDBButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="don't use localDB"
+        android:text="ローカルデータベース非使用"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </android.support.constraint.ConstraintLayout>

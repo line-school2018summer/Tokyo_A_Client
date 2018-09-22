@@ -12,7 +12,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -34,7 +34,7 @@
             android:layout_marginBottom="9dp"
             android:layout_marginTop="5dp"
             android:gravity="center_vertical"
-            android:text="UserName"
+            android:text="名前"
             android:textSize="25sp"
             app:layout_constraintBottom_toBottomOf="@+id/icon"
             app:layout_constraintEnd_toStartOf="@+id/createGroupButton"
