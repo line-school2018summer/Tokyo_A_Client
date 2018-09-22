@@ -14,6 +14,15 @@
         android:layout_height="match_parent">
 
         <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/bg"
+            android:scaleType="centerCrop" />
+
+        <ImageView
             android:id="@+id/icon"
             android:layout_width="240px"
             android:layout_height="240px" />
@@ -25,7 +34,7 @@
             android:layout_marginBottom="9dp"
             android:layout_marginTop="5dp"
             android:gravity="center_vertical"
-            android:text="UserName"
+            android:text="名前"
             android:textSize="25sp"
             app:layout_constraintBottom_toBottomOf="@+id/icon"
             app:layout_constraintEnd_toStartOf="@+id/createGroupButton"
@@ -44,7 +53,7 @@
             android:layout_marginStart="1dp"
             android:text="ともだち"
             android:textSize="24sp"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ownNameText"
@@ -71,7 +80,7 @@
             android:layout_marginStart="1dp"
             android:text="グループ"
             android:textSize="24sp"
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/friendList"

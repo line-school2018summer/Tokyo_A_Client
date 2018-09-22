@@ -18,7 +18,7 @@
         android:layout_marginStart="85dp"
         android:layout_marginTop="18dp"
         android:ems="10"
-        android:hint="New Name"
+        android:hint="新しい名前"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/applyButton"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,7 +33,7 @@
         android:layout_marginLeft="148dp"
         android:layout_marginRight="148dp"
         android:layout_marginStart="148dp"
-        android:text="apply"
+        android:text="適用"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
