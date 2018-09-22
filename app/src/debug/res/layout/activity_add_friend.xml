@@ -5,6 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/bg"
+        android:scaleType="centerCrop" />
+
     <EditText
         android:id="@+id/searchNameText"
         android:layout_width="wrap_content"
@@ -16,7 +25,7 @@
         android:layout_marginStart="84dp"
         android:layout_marginTop="86dp"
         android:ems="10"
-        android:hint="Name"
+        android:hint="名前"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/searchFriendButton"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,7 +42,7 @@
         android:layout_marginRight="149dp"
         android:layout_marginStart="147dp"
         android:layout_marginTop="33dp"
-        android:text="search"
+        android:text="検索"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/searchNameText" />
@@ -45,7 +54,7 @@
         android:layout_marginBottom="21dp"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorLayout"
         android:text="フレンド"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,7 +81,7 @@
         android:layout_marginBottom="21dp"
         android:layout_marginTop="0dp"
         android:gravity="center"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorLayout"
         android:text="新しいフレンド"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"

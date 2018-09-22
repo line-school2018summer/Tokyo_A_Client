@@ -6,6 +6,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/imageView"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/bg"
+        android:scaleType="centerCrop" />
+
     <TextView
         android:id="@+id/friendListTextView"
         android:layout_width="381dp"
@@ -16,13 +25,13 @@
         android:layout_marginRight="2dp"
         android:layout_marginStart="1dp"
         android:layout_marginTop="1dp"
-        android:text="Friend List"
+        android:text="フレンド リスト"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/friendList"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/addFriendButton"
-        tools:text="Friend List" />
+        tools:text="フレンド リスト" />
 
     <TextView
         android:id="@+id/ownNameText"
@@ -35,7 +44,7 @@
         android:layout_marginStart="7dp"
         android:layout_marginTop="5dp"
         android:gravity="center_vertical"
-        android:text="Hello"
+        android:text="こんにちは"
         android:textSize="30sp"
         app:layout_constraintBottom_toTopOf="@+id/friendListTextView"
         app:layout_constraintEnd_toStartOf="@+id/addFriendButton"
