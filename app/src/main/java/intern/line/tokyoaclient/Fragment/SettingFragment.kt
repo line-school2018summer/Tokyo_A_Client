@@ -19,6 +19,7 @@ import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.SelfInfoDBHelper
 import intern.line.tokyoaclient.LocalDataBase.SelfInfoLocalDBService
+import kotlinx.android.synthetic.main.fragment_setting.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 
@@ -53,6 +54,7 @@ class SettingFragment : Fragment() {
 
     private lateinit var v: View
     private lateinit var editNameButton: Button
+    private lateinit var logoutButton: Button
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -66,6 +68,11 @@ class SettingFragment : Fragment() {
         editIcon = v.findViewById(R.id.editIcon) as ImageView
         editIcon.setOnClickListener {
             goIconEdit()
+        }
+
+        logoutButton = v.findViewById(R.id.logoutButton) as Button
+        logoutButton.setOnClickListener {
+            logout()
         }
 
         return v
@@ -132,5 +139,11 @@ class SettingFragment : Fragment() {
         var intent = Intent(context, EditIconActivity::class.java)
         intent.putExtra("userId", userId)
         startActivity(intent)
+    }
+
+    private fun logout() {
+        val intent = Intent(context, MainActivity::class.java)
+        startActivity(intent)
+        activity?.finish()
     }
 }
