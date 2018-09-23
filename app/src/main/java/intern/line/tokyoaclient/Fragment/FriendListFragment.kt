@@ -40,6 +40,7 @@ class FriendListFragment : Fragment() {
     private lateinit var sdb: SQLiteDatabase
     private lateinit var selfInfoHelper: SelfInfoDBHelper
 
+    private val CREATE_NEW_GROUP = 1
     private val REQUEST_ADD_FRIEND = 1 // request code
 
     override fun onCreate(savedInstanceState: Bundle?) { // 最初の1回だけ呼ばれる
@@ -413,6 +414,7 @@ class FriendListFragment : Fragment() {
     private fun goToCreateGroup(userId: String) {
         val intent = Intent(context, CreateGroupActivity::class.java)
         intent.putExtra("userId", userId)
+        intent.putExtra("mode", CREATE_NEW_GROUP)
         startActivity(intent)
     }
 

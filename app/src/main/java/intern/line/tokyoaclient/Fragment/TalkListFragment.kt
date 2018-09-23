@@ -142,8 +142,8 @@ class TalkListFragment : Fragment() {
         RoomLocalDBService().getAllRoom(rdb, context) { cursor ->
             val allUpdated = data.find{ it.roomId.equals(cursor.getString(0)) && it.roomName.equals(cursor.getString(1)) && it.pathToFile.equals(cursor.getString(2))} // 変更なし
             val exists = data.find{ it.roomId.equals(cursor.getString(0)) } // 存在はする
+
             if(exists != null && allUpdated == null) {
-                debugLog(context, "hoge")
                 exists.roomName = cursor.getString(1)
                 exists.pathToFile = cursor.getString(2)
                 adapter?.notifyDataSetChanged()
@@ -264,33 +264,44 @@ class TalkListFragment : Fragment() {
                         roomWithImageUrlAndLatestTalk.isGroup = true
                         roomWithImageUrlAndLatestTalk.createdAt = it.createdAt
                         roomWithImageUrlAndLatestTalk.roomName = it.roomName
-                        roomWithImageUrlAndLatestTalk.pathToFile = "default.jpg"
-                        val target = searchDataWithRoomId(roomWithImageUrlAndLatestTalk.roomId)
-                        if(target == null) {
-                            print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
-                            adapter?.add(roomWithImageUrlAndLatestTalk)
-                            Collections.sort(data, RoomComparator())
-                            adapter?.notifyDataSetChanged()
-                        }
-
-                        if(USE_LOCAL_DB) {
-                            RoomLocalDBService().addRoom(it.roomId,
-                                    it.roomName,
-                                    "default.jpg",
-                                    it.createdAt,
-                                    it.isGroup,
-                                    sinceTalkId,
-                                    roomWithImageUrlAndLatestTalk.latestTalk,
-                                    roomWithImageUrlAndLatestTalk.latestTalkTime,
-                                    rdb, context)
-                            debugLog(context, "added room to localDB: roomid is ${it.roomId}")
-                        }
+                        getRoomIcon(roomWithImageUrlAndLatestTalk, sinceTalkId)
                     } else { // 個人チャット
                         roomWithImageUrlAndLatestTalk.isGroup = false
                         getMembers(roomWithImageUrlAndLatestTalk, sinceTalkId)
                     }
                 }, {
                     debugLog(context, "get room failed: $it")
+                })
+    }
+
+    private fun getRoomIcon(roomWithImageUrlAndLatestTalk: RoomWithImageUrlAndLatestTalk, sinceTalkId: Long) {
+        imageService.getImageUrlById(roomWithImageUrlAndLatestTalk.roomId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    roomWithImageUrlAndLatestTalk.pathToFile = it.pathToFile
+                    val target = searchDataWithRoomId(roomWithImageUrlAndLatestTalk.roomId)
+                    if(target == null) {
+                        print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
+                        adapter?.add(roomWithImageUrlAndLatestTalk)
+                        Collections.sort(data, RoomComparator())
+                        adapter?.notifyDataSetChanged()
+                    }
+
+                    if(USE_LOCAL_DB) {
+                        RoomLocalDBService().addRoom(roomWithImageUrlAndLatestTalk.roomId,
+                                roomWithImageUrlAndLatestTalk.roomName,
+                                "default.jpg",
+                                it.createdAt,
+                                roomWithImageUrlAndLatestTalk.isGroup,
+                                sinceTalkId,
+                                roomWithImageUrlAndLatestTalk.latestTalk,
+                                roomWithImageUrlAndLatestTalk.latestTalkTime,
+                                rdb, context)
+                        debugLog(context, "added room to localDB: roomid is ${roomWithImageUrlAndLatestTalk.roomId}")
+                    }
+                }, {
+                    debugLog(context, "get image url failed: $it")
                 })
     }
 

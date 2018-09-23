@@ -43,6 +43,7 @@ class TalkActivity : AppCompatActivity() {
     private lateinit var data: ArrayList<TalkWithImageUrl>
     private var alive = true
 
+    private var CREATE_ADDITIONAL_GROUP = 2
     private var REQUEST_ADD_MEMBER = 1001
 
     // キーボード表示を制御するためのオブジェクト
@@ -149,10 +150,14 @@ class TalkActivity : AppCompatActivity() {
         //ボタンをゲットしておく
         val sendButton = findViewById(R.id.sendButton) as Button
         val addMemberButton = findViewById(R.id.addMemberButton) as Button
-        if(isGroup)
+        val addGroupButton = findViewById(R.id.addGroupButton) as Button
+        if(isGroup) {
             addMemberButton.visibility = View.VISIBLE
-        else
+            addGroupButton.visibility = View.VISIBLE
+        } else {
             addMemberButton.visibility = View.INVISIBLE
+            addGroupButton.visibility = View.INVISIBLE
+        }
 
         //それぞれのボタンが押されたときにメソッドを呼び出す
         sendButton.setOnClickListener {
@@ -161,6 +166,10 @@ class TalkActivity : AppCompatActivity() {
 
         addMemberButton.setOnClickListener {
             goAddMember()
+        }
+
+        addGroupButton.setOnClickListener {
+            goAddGroup()
         }
 
         val roomNameText = findViewById(R.id.roomName) as TextView
@@ -404,6 +413,17 @@ class TalkActivity : AppCompatActivity() {
         intent.putExtra("roomMemberIds", roomMemberList.map { it -> it.id }.toTypedArray())
         intent.putExtra("roomMemberNames", roomMemberList.map { it -> it.name }.toTypedArray())
         intent.putExtra("roomMemberIcons", roomMemberList.map { it -> it.pathToFile }.toTypedArray())
+        startActivity(intent)
+    }
+
+    private fun goAddGroup() {
+        val intent = Intent(this, CreateGroupActivity::class.java)
+        intent.putExtra("userId", userId)
+        intent.putExtra("roomId", roomId)
+        intent.putExtra("roomMemberIds", roomMemberList.map { it -> it.id }.toTypedArray())
+        intent.putExtra("roomMemberNames", roomMemberList.map { it -> it.name }.toTypedArray())
+        intent.putExtra("roomMemberIcons", roomMemberList.map { it -> it.pathToFile }.toTypedArray())
+        intent.putExtra("mode", CREATE_ADDITIONAL_GROUP)
         startActivity(intent)
     }
 

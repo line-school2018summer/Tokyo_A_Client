@@ -60,4 +60,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/addGroupButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text=""
+        android:textColor="@color/colorText"
+        android:textSize="20sp"
+        app:layout_constraintEnd_toStartOf="@+id/addMemberButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </android.support.constraint.ConstraintLayout>

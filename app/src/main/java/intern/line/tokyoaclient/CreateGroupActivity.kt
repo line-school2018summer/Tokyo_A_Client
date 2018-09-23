@@ -17,6 +17,7 @@ import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import intern.line.tokyoaclient.LocalDataBase.FriendLocalDBService
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.security.cert.CRLException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -24,6 +25,7 @@ import kotlin.collections.ArrayList
 class CreateGroupActivity : AppCompatActivity() {
 
     private var userId: String = "default"
+    private var mode: Int = -1
     private lateinit var friendList: ListView
     private lateinit var counter: TextView
     private var count = 0
@@ -34,6 +36,8 @@ class CreateGroupActivity : AppCompatActivity() {
     private lateinit var fdb: SQLiteDatabase
     private lateinit var helper: FriendDBHelper
 
+    private val CREATE_NEW_GROUP = 1
+    private val CREATE_ADDITIONAL_GROUP = 2
     private val REQUEST_CREATE_GROUP = 1 // request code
 
 
@@ -50,6 +54,7 @@ class CreateGroupActivity : AppCompatActivity() {
         friendList.setAdapter(adapter)
 
         userId = intent.getStringExtra("userId")
+        mode = intent.getIntExtra("mode", -1)
 
         if (USE_LOCAL_DB) {
             try {
@@ -70,10 +75,41 @@ class CreateGroupActivity : AppCompatActivity() {
             this.deleteDatabase(FriendDBHelper(this).databaseName)
         }
 
-        if (USE_LOCAL_DB) {
-            getFriendByLocalDB()
-        } else {
-            getFriend(userId)
+        when {
+            mode <= 1 -> {
+                if (USE_LOCAL_DB) {
+                    getFriendByLocalDB()
+                } else {
+                    getFriend(userId)
+                }
+            }
+            mode == 2 -> {
+                try {
+                    val roomMemberIds = intent.getStringArrayExtra("roomMemberIds")
+                    val roomMemberNames = intent.getStringArrayExtra("roomMemberNames")
+                    val roomMemberIcons = intent.getStringArrayExtra("roomMemberIcons")
+                    for (i in 0..roomMemberIds.size - 1) {
+                        adapter?.add(UserProfileWithImageUrl(
+                                id = roomMemberIds[i],
+                                name = roomMemberNames[i],
+                                pathToFile = roomMemberIcons[i]
+                        ))
+                    }
+                    /*
+                    for (i in 0..roomMemberIds.size - 1) {
+                        val view = adapter?.getView(i, null, null)
+                        val check = view!!.findViewById<CheckedTextView>(R.id.nameTextView)
+                        check.isChecked = true
+                        check.toggle()
+                    }
+                    count = data.size
+                    counter.text = count.toString()
+                    selectedUsers.addAll(data)
+                    */
+                } catch (e: Exception) {
+                    debugLog(this, "intent error: $e")
+                }
+            }
         }
 
         val createButton = findViewById(R.id.createButton) as Button
