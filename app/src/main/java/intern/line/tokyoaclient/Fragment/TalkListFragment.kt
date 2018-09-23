@@ -108,7 +108,7 @@ class TalkListFragment : Fragment() {
         super.onResume()
         alive = true
         first = true
-        timer = Timer().schedule(0, 500000, { getRoom(userId) })
+        timer = Timer().schedule(0, 300000, { getRoom(userId) })
     }
 
     override fun onPause() {
@@ -237,7 +237,7 @@ class TalkListFragment : Fragment() {
 
     // （ローカルに存在する）ルームの検索
     private fun searchDataWithRoomId(roomId: String): RoomWithImageUrlAndLatestTalk? {
-        val target = data.find { it.roomId == roomId }
+        val target = data.find { it.roomId.equals(roomId) }
         return target
     }
 
@@ -251,10 +251,13 @@ class TalkListFragment : Fragment() {
                         roomWithImageUrlAndLatestTalk.createdAt = it.createdAt
                         roomWithImageUrlAndLatestTalk.roomName = it.roomName
                         roomWithImageUrlAndLatestTalk.pathToFile = "default.jpg"
-                        print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
-                        adapter?.add(roomWithImageUrlAndLatestTalk)
-                        Collections.sort(data, RoomComparator())
-                        adapter?.notifyDataSetChanged()
+                        val target = searchDataWithRoomId(roomWithImageUrlAndLatestTalk.roomId)
+                        if(target == null) {
+                            print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
+                            adapter?.add(roomWithImageUrlAndLatestTalk)
+                            Collections.sort(data, RoomComparator())
+                            adapter?.notifyDataSetChanged()
+                        }
 
                         if(USE_LOCAL_DB) {
                             RoomLocalDBService().addRoom(it.roomId,
@@ -327,10 +330,13 @@ class TalkListFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     roomWithImageUrlAndLatestTalk.pathToFile = it.pathToFile
-                    print("(2) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
-                    adapter?.add(roomWithImageUrlAndLatestTalk)
-                    Collections.sort(data, RoomComparator())
-                    adapter?.notifyDataSetChanged()
+                    val target = searchDataWithRoomId(roomWithImageUrlAndLatestTalk.roomId)
+                        if(target == null) {
+                            print("(2) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
+                            adapter?.add(roomWithImageUrlAndLatestTalk)
+                            Collections.sort(data, RoomComparator())
+                            adapter?.notifyDataSetChanged()
+                        }
 
                     if(USE_LOCAL_DB) {
                         RoomLocalDBService().addRoom(roomWithImageUrlAndLatestTalk.roomId,

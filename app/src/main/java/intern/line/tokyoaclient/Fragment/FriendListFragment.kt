@@ -230,7 +230,7 @@ class FriendListFragment : Fragment() {
                 })
     }
 
-    private fun getFriendName(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    private fun getFriendName(friendId: String) {
         userProfileService.getUserById(friendId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

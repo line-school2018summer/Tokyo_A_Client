@@ -109,13 +109,17 @@ class TalkActivity : AppCompatActivity() {
                     FriendLocalDBService().getFriend(it.getString(1), fdb, this) {
                         try {
                             it.moveToNext()
-                            roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
+                            val id = it.getString(0)
+                            if(roomMemberList.find { it.id.equals(id) } == null)
+                                roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
                         } catch (e: CursorIndexOutOfBoundsException) {
                             // フレンドで見つからなかったらそれは自分
                             SelfInfoLocalDBService().getInfo(sdb) {
                                 try {
                                     it.moveToNext()
-                                    roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
+                                    val id = it.getString(0)
+                                    if(roomMemberList.find { it.id.equals(id) } == null)
+                                        roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
                                 } catch (e: CursorIndexOutOfBoundsException) { // 自分でもなかったらフレンドではない，知らない人
                                     getUserInfo(uid)
                                 }
@@ -144,6 +148,11 @@ class TalkActivity : AppCompatActivity() {
 
         addMemberButton.setOnClickListener {
             goAddMember()
+        }
+
+        val roomNameText = findViewById(R.id.roomName) as TextView
+        roomNameText.setOnClickListener {
+            goSeeRoomMember()
         }
 
         if(USE_LOCAL_DB) {
@@ -301,6 +310,8 @@ class TalkActivity : AppCompatActivity() {
                     talk.createdAt,
                     talk.updatedAt))
         } else {
+            getSendersName(talk)
+            /*
             adapter?.add(TalkWithImageUrl(
                     talk.talkId,
                     "unknown",
@@ -310,6 +321,7 @@ class TalkActivity : AppCompatActivity() {
                     "default.jpg",
                     talk.createdAt,
                     talk.updatedAt))
+                    */
         }
         Collections.sort(data, TimeComparator())
         adapter?.notifyDataSetChanged()
@@ -366,6 +378,16 @@ class TalkActivity : AppCompatActivity() {
         intent.putExtra("userId", userId)
         intent.putExtra("roomId", roomId)
         startActivityForResult(intent, REQUEST_ADD_MEMBER)
+    }
+
+    private fun goSeeRoomMember() {
+        val intent = Intent(this, MemberListActivity::class.java)
+        intent.putExtra("userId", userId)
+        intent.putExtra("roomId", roomId)
+        intent.putExtra("roomMemberIds", roomMemberList.map { it -> it.id }.toTypedArray())
+        intent.putExtra("roomMemberNames", roomMemberList.map { it -> it.name }.toTypedArray())
+        intent.putExtra("roomMemberIcons", roomMemberList.map { it -> it.pathToFile }.toTypedArray())
+        startActivity(intent)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
