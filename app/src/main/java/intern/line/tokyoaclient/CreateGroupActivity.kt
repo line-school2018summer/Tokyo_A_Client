@@ -161,6 +161,7 @@ class CreateGroupActivity : AppCompatActivity() {
     private fun createGroup(users: ArrayList<UserProfileWithImageUrl>) {
         val intent = Intent(this, ConfigureGroupActivity::class.java)
         intent.putExtra("userId", userId)
+        Collections.sort(users, NameComparator())
         intent.putExtra("userIds", users.map{it -> it.id}.toTypedArray())
         intent.putExtra("userNames", users.map{it -> it.name}.toTypedArray())
         intent.putExtra("userIcons", users.map{it -> it.pathToFile}.toTypedArray())

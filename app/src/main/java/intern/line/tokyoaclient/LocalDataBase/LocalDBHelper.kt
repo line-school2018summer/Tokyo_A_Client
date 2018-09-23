@@ -163,15 +163,21 @@ class FriendDBHelper(var context: Context?) : SQLiteOpenHelper(context, "friend_
 
 class FriendLocalDBService {
     fun addFriend(id: String, name: String, pathToFile: String, fdb: SQLiteDatabase, context: Context?) {
-        val value: ContentValues = ContentValues().also {
-            it.put("id", id)
-            it.put("name", name)
-            it.put("path_to_file", pathToFile)
-        }
-        val res: Long = fdb.insert("friends", null, value)
-        if(res < 0) {
-            // error
-            Toast.makeText(context, "error in INSERT", Toast.LENGTH_SHORT).show()
+        getFriend(id, fdb, context) {
+            if (it.count == 0) { // データが見つからない場合，新規作成
+                val value: ContentValues = ContentValues().also {
+                    it.put("id", id)
+                    it.put("name", name)
+                    it.put("path_to_file", pathToFile)
+                }
+                val res: Long = fdb.insert("friends", null, value)
+                if (res < 0) {
+                    // error
+                    Toast.makeText(context, "error in INSERT", Toast.LENGTH_SHORT).show()
+                }
+            } else { // すでにデータが存在する場合，更新
+                updateFriend(id, name, pathToFile, fdb)
+            }
         }
     }
 
@@ -189,6 +195,14 @@ class FriendLocalDBService {
         val cursor = fdb.rawQuery(sqlstr, null)
         cursor.moveToPosition(-1)
         func(cursor)
+    }
+
+    fun updateFriend(id: String, name: String, pathToFile: String, fdb: SQLiteDatabase) {
+        val value: ContentValues = ContentValues().also {
+            it.put("name", name)
+            it.put("path_to_file", pathToFile)
+        }
+        fdb.update("friends", value, "id=?", arrayOf(id))
     }
 }
 

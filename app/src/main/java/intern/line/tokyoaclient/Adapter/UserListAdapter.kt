@@ -63,6 +63,7 @@ class UserListAdapterWithImage(context: Context, usersWithImageUrl: List<UserPro
         val user = getItem(position) as UserProfileWithImageUrl
         holder.nameTextView.text = user.name
         holder.idTextView.text = user.id
+        holder.idTextView.visibility = View.INVISIBLE
         holder.pathToFile = user.pathToFile
         Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + user.pathToFile).into(holder.iconImageView)
         return view!!

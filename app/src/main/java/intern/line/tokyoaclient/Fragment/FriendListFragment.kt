@@ -16,6 +16,7 @@ import intern.line.tokyoaclient.*
 import intern.line.tokyoaclient.Adapter.NameComparator
 import intern.line.tokyoaclient.Adapter.UserListAdapterWithImage
 import intern.line.tokyoaclient.HttpConnection.*
+import intern.line.tokyoaclient.HttpConnection.model.Room
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.LocalDataBase.*
 import rx.android.schedulers.AndroidSchedulers
@@ -55,7 +56,7 @@ class FriendListFragment : Fragment() {
             }
 
             try {
-                fdb = friendHelper.readableDatabase
+                fdb = friendHelper.writableDatabase
                 rdb = roomHelper.writableDatabase
                 sdb = selfInfoHelper.writableDatabase
                 Toast.makeText(context, "accessed to database", Toast.LENGTH_SHORT).show()
@@ -69,10 +70,8 @@ class FriendListFragment : Fragment() {
             Toast.makeText(context, "deleted database", Toast.LENGTH_SHORT).show()
         }
 
-        //MyPagerAdapterで設定しておいたargumentsを取得
+        // MyPagerAdapterで設定しておいたargumentsを取得
         userId = arguments!!.getString("userId")
-        getOwnName(userId)
-        getOwnIcon(userId)
 
         // フレンドの取得
         friendData = ArrayList()
@@ -82,9 +81,6 @@ class FriendListFragment : Fragment() {
         if (USE_LOCAL_DB) {
             getFriendByLocalDB()
             getGroupByLocalDB()
-        } else {
-            getFriend(userId)
-            getGroup(userId)
         }
     }
 
@@ -106,8 +102,6 @@ class FriendListFragment : Fragment() {
         groupList = v.findViewById(R.id.groupList) as ListView
         userIconImageView = v.findViewById(R.id.icon) as ImageView
 
-        getOwnName(userId)
-        getOwnIcon(userId)
         friendList.adapter = friendAdapter
         groupList.adapter = groupAdapter
 
@@ -122,7 +116,6 @@ class FriendListFragment : Fragment() {
             val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
             val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
             val roomId: String = (num1 + num2).toString()
-            // val roomId: String = UUID.randomUUID().toString()
             addMemberToRoomAfterCreateRoom(userId, friendId, roomId)
             goToTalk(roomId, view.findViewById<TextView>(R.id.nameTextView).text.toString(), false)
         }
@@ -133,16 +126,55 @@ class FriendListFragment : Fragment() {
         return v
     }
 
-    private fun getOwnName(idStr: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    override fun onResume() {
+        super.onResume()
+        getOwnNameAndIcon(userId)
+        getFriend(userId)
+        getGroup(userId)
+    }
+
+    private fun getOwnNameAndIcon(idStr: String) {
+        if (USE_LOCAL_DB) {
+            var found = false
+            SelfInfoLocalDBService().getInfo(sdb) {
+                if (it.count != 0) {
+                    it.moveToNext()
+                    (v.findViewById(R.id.ownNameText) as TextView).text = it.getString(1)
+                    val pathToFile = it.getString(2)
+                    if (pathToFile != "") {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + pathToFile).into(userIconImageView)
+                    } else {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(userIconImageView)
+                    }
+                    found = true
+                }
+            }
+            if (found)
+                return
+        }
         userProfileService.getUserById(idStr)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     (v.findViewById(R.id.ownNameText) as TextView).text = it.name
-                    if(USE_LOCAL_DB)
+                    if (USE_LOCAL_DB)
                         addSelfInfoToLocalDB(it.name)
                 }, {
                     debugLog(context, "get name failed: $it")
+                })
+        imageService.getImageUrlById(idStr)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    if (it.pathToFile != "") {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(userIconImageView)
+                    } else {
+                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(userIconImageView)
+                    }
+                    if (USE_LOCAL_DB)
+                        addIconInfoToLocalDB(it.pathToFile)
+                }, {
+                    debugLog(context, "get image url failed: $it")
                 })
     }
 
@@ -154,19 +186,8 @@ class FriendListFragment : Fragment() {
         }
     }
 
-    private fun getOwnIcon(idStr: String) {
-        imageService.getImageUrlById(idStr)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    if (it.pathToFile != "") {
-                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + it.pathToFile).into(userIconImageView)
-                    } else {
-                        Glide.with(context).load("http://ec2-52-197-250-179.ap-northeast-1.compute.amazonaws.com/image/url/" + "default.jpg").into(userIconImageView)
-                    }
-                }, {
-                    debugLog(context, "get image url failed: $it")
-                })
+    private fun addIconInfoToLocalDB(pathToFile: String) {
+        SelfInfoLocalDBService().updatePathToFileInfo(userId, pathToFile, sdb)
     }
 
     private fun getFriendByLocalDB() {
@@ -197,7 +218,6 @@ class FriendListFragment : Fragment() {
     }
 
     private fun getFriend(userId: String) {
-        friendAdapter?.clear()
         friendService.getFriendById(userId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -210,7 +230,7 @@ class FriendListFragment : Fragment() {
                 })
     }
 
-    private fun getFriendName(friendId: String) { // idを引数に、nameをゲットする関数。ユーザー情報のGET/POSTメソッドはどっかに分離したほうがわかりやすそう。
+    private fun getFriendName(friendId: String) {
         userProfileService.getUserById(friendId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -226,16 +246,27 @@ class FriendListFragment : Fragment() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    if (it.pathToFile != "") {
-                        friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
-                    } else {
-                        friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                    val pathToFileStr = it.pathToFile
+                    val allUpdated = friendData.find{ it.id.equals(idStr) && it.name.equals(nameStr) && it.pathToFile.equals(pathToFileStr)} // 変更なし
+                    val exists = friendData.find{ it.id.equals(idStr) } // 存在はする
+
+                    if(exists != null && allUpdated == null) {
+                        friendAdapter?.remove(exists)
+                    }
+                    if(allUpdated == null) {
+                        if (pathToFileStr != "") {
+                            friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, pathToFileStr))
+                        } else {
+                            friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                        }
+                        if(USE_LOCAL_DB)
+                            FriendLocalDBService().addFriend(idStr, nameStr, pathToFileStr, fdb, context)
                     }
                     Collections.sort(friendData, NameComparator())
                 }, {
                     debugLog(context, "get image url failed: $it")
-                    friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
-                    Collections.sort(friendData, NameComparator())
+                    // friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                    // Collections.sort(friendData, NameComparator())
                 })
     }
 
@@ -258,26 +289,37 @@ class FriendListFragment : Fragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if(it.isGroup) {
-                        getRoomIcon(roomId, it.roomName)
+                        getRoomIcon(roomId, it.roomName, it)
                     }
                 }, {
                 })
     }
 
-    private fun getRoomIcon(roomId: String, roomName: String) {
+    private fun getRoomIcon(roomId: String, roomName: String, room: Room) {
         imageService.getImageUrlById(roomId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    if (it.pathToFile != "") {
-                        groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, it.pathToFile))
-                    } else {
-                        groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
+                    val pathToFileStr = it.pathToFile
+                    val allUpdated = groupData.find{ it.id.equals(roomId) && it.name.equals(roomName) && it.pathToFile.equals(pathToFileStr)} // 変更なし
+                    val exists = groupData.find{ it.id.equals(roomId) } // 存在はする
+
+                    if(exists != null && allUpdated == null) {
+                        groupAdapter?.remove(exists)
+                    }
+                    if(allUpdated == null) {
+                        if (pathToFileStr != "") {
+                            groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, pathToFileStr))
+                        } else {
+                            groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
+                        }
+                        if(USE_LOCAL_DB)
+                            RoomLocalDBService().addRoom(roomId, roomName, pathToFileStr, room.createdAt, room.isGroup, -1, "", Timestamp(0L), rdb, context)
                     }
                     Collections.sort(groupData, NameComparator())
                 }, {
                     debugLog(context, "get image url failed: $it")
-                    groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
+                    // groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
                     Collections.sort(groupData, NameComparator())
                 })
     }

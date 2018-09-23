@@ -32,6 +32,7 @@
         <activity android:name=".CreateGroupActivity" />
         <activity android:name=".ConfigureGroupActivity" />
         <activity android:name=".AddMemberActivity" />
+        <activity android:name=".MemberListActivity" />
     </application>
 
 </manifest>

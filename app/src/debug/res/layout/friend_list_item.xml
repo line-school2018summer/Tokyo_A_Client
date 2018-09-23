@@ -15,6 +15,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:text="Friend_name"
+        android:textColor="@color/colorText"
         android:textSize="16sp" />
 
     <TextView
@@ -24,6 +25,7 @@
         android:layout_weight="1"
         android:gravity="center_vertical"
         android:text="TextView"
+        android:textColor="@color/colorText"
         android:textSize="14sp" />
 
 </LinearLayout>
