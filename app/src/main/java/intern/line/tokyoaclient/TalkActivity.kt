@@ -152,7 +152,8 @@ class TalkActivity : AppCompatActivity() {
 
         val roomNameText = findViewById(R.id.roomName) as TextView
         roomNameText.setOnClickListener {
-            goSeeRoomMember()
+            if(isGroup)
+                goSeeRoomMember()
         }
 
         if(USE_LOCAL_DB) {
