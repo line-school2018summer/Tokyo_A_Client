@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Debug
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import intern.line.tokyoaclient.HttpConnection.*
+import intern.line.tokyoaclient.R
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody

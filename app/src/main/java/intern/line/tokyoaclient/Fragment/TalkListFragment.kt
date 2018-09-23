@@ -62,7 +62,7 @@ class TalkListFragment : Fragment() {
                 fdb = friendHelper.writableDatabase
                 rdb = roomHelper.writableDatabase
                 tdb = talkHelper.writableDatabase
-                Toast.makeText(context, "accessed to database", Toast.LENGTH_SHORT).show()
+                // debugLog(context, "accessed to database")
             } catch (e: SQLiteException) {
                 debugLog(context, "writable error: ${e.toString()}")
             }
@@ -108,6 +108,7 @@ class TalkListFragment : Fragment() {
         super.onResume()
         alive = true
         first = true
+        updateRoomByLocalDB()
         timer = Timer().schedule(0, 300000, { getRoom(userId) })
     }
 
@@ -135,6 +136,19 @@ class TalkListFragment : Fragment() {
             ))
         }
         adapter?.notifyDataSetChanged()
+    }
+
+    private fun updateRoomByLocalDB() {
+        RoomLocalDBService().getAllRoom(rdb, context) { cursor ->
+            val allUpdated = data.find{ it.roomId.equals(cursor.getString(0)) && it.roomName.equals(cursor.getString(1)) && it.pathToFile.equals(cursor.getString(2))} // 変更なし
+            val exists = data.find{ it.roomId.equals(cursor.getString(0)) } // 存在はする
+            if(exists != null && allUpdated == null) {
+                debugLog(context, "hoge")
+                exists.roomName = cursor.getString(1)
+                exists.pathToFile = cursor.getString(2)
+                adapter?.notifyDataSetChanged()
+            }
+        }
     }
 
     // userが所属するroomを取得

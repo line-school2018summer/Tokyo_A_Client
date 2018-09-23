@@ -1,14 +1,17 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.NoUse
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.*
 import intern.line.tokyoaclient.Adapter.UserListAdapter
+import intern.line.tokyoaclient.AddFriendActivity
+import intern.line.tokyoaclient.CreateGroupActivity
 import intern.line.tokyoaclient.HttpConnection.*
 import rx.android.schedulers.AndroidSchedulers
 import intern.line.tokyoaclient.HttpConnection.friendService
-import kotlinx.android.synthetic.main.fragment_friend_list.*
+import intern.line.tokyoaclient.R
+import intern.line.tokyoaclient.TalkActivity
 import rx.schedulers.Schedulers
 import java.util.UUID
 

@@ -1,10 +1,11 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Debug
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.*
 import intern.line.tokyoaclient.HttpConnection.*
 import intern.line.tokyoaclient.HttpConnection.model.UserProfile
+import intern.line.tokyoaclient.R
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 

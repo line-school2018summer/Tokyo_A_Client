@@ -259,8 +259,14 @@ class FriendListFragment : Fragment() {
                         } else {
                             friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
                         }
-                        if(USE_LOCAL_DB)
+                        if(USE_LOCAL_DB) {
                             FriendLocalDBService().addFriend(idStr, nameStr, pathToFileStr, fdb, context)
+                            val friendId = idStr
+                            val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
+                            val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
+                            val roomId: String = (num1 + num2).toString()
+                            RoomLocalDBService().updateRoomInfo(roomId, nameStr, pathToFileStr, rdb, context)
+                        }
                     }
                     Collections.sort(friendData, NameComparator())
                 }, {

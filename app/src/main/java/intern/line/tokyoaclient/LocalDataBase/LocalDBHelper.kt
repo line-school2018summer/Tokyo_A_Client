@@ -206,6 +206,80 @@ class FriendLocalDBService {
     }
 }
 
+
+class NonFriendDBHelper(var context: Context?) : SQLiteOpenHelper(context, "non_friend_info.db", null, 1) {
+    override fun onCreate(db: SQLiteDatabase?) {
+        //データベースがないときに実行される
+        // フレンド
+        // 初期およびフレンド追加時以外は変化しないはず？
+        db?.execSQL("create table friends ( " +
+                "id text not null, " +
+                "name text not null, " +
+                "path_to_file text not null" +
+                ");")
+
+        Toast.makeText(context, "table created", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
+        //バージョンアップしたときに実行される
+        //テーブルのdeleteなどを行う
+        db?.execSQL("drop table if exists friends")
+        onCreate(db)
+        Toast.makeText(context, "table updated", Toast.LENGTH_SHORT).show()
+    }
+}
+
+class NonFriendLocalDBService {
+    fun addFriend(id: String, name: String, pathToFile: String, nfdb: SQLiteDatabase, context: Context?) {
+        getFriend(id, nfdb, context) {
+            if (it.count == 0) { // データが見つからない場合，新規作成
+                val value: ContentValues = ContentValues().also {
+                    it.put("id", id)
+                    it.put("name", name)
+                    it.put("path_to_file", pathToFile)
+                }
+                val res: Long = nfdb.insert("friends", null, value)
+                if (res < 0) {
+                    // error
+                    Toast.makeText(context, "error in INSERT", Toast.LENGTH_SHORT).show()
+                }
+            } else { // すでにデータが存在する場合，更新
+                updateFriend(id, name, pathToFile, nfdb)
+            }
+        }
+    }
+
+    fun getAllFriend(nfdb: SQLiteDatabase, context: Context?, func: (Cursor) -> Unit) {
+        val sqlstr = "select * from friends"
+        val cursor = nfdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        while(cursor.moveToNext()) {
+            func(cursor)
+        }
+    }
+
+    fun getFriend(id: String, nfdb: SQLiteDatabase, context: Context?, func: (Cursor) -> Unit) {
+        val sqlstr = "select * from friends where id = '$id'"
+        val cursor = nfdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        func(cursor)
+    }
+
+    fun updateFriend(id: String, name: String, pathToFile: String, nfdb: SQLiteDatabase) {
+        val value: ContentValues = ContentValues().also {
+            it.put("name", name)
+            it.put("path_to_file", pathToFile)
+        }
+        nfdb.update("friends", value, "id=?", arrayOf(id))
+    }
+
+    fun deleteFriend(id: String, nfdb: SQLiteDatabase) {
+        nfdb.delete("friends", "id=?", arrayOf(id))
+    }
+}
+
+
 class RoomDBHelper(var context: Context?) : SQLiteOpenHelper(context, "room_info.db", null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
         //データベースがないときに実行される
@@ -287,6 +361,18 @@ class RoomLocalDBService {
         func(cursor)
     }
 
+    fun updateRoomInfo(roomId: String, newRoomName: String, newPathToFile: String, rdb: SQLiteDatabase, context: Context?) {
+        getRoomById(roomId, rdb, context) {
+            if (it.count != 0) {
+                val value: ContentValues = ContentValues().also {
+                    it.put("room_name", newRoomName)
+                    it.put("path_to_file", newPathToFile)
+                }
+                rdb.update("rooms", value, "room_id=?", arrayOf(roomId))
+            }
+        }
+    }
+
     fun getRoomMembers(id: String, rdb: SQLiteDatabase, context: Context?, func: (Cursor) -> Unit) {
         val sqlstr = "select * from room_members where room_id = '$id'"
         val cursor = rdb.rawQuery(sqlstr, null)
@@ -294,16 +380,27 @@ class RoomLocalDBService {
         func(cursor)
     }
 
+    fun getRoomMemberFromRoom(roomId: String, uid: String, rdb: SQLiteDatabase, func: (Cursor) -> Unit) {
+        val sqlstr = "select * from room_members where room_id = '$roomId' and user_id = '$uid'"
+        val cursor = rdb.rawQuery(sqlstr, null)
+        cursor.moveToPosition(-1)
+        func(cursor)
+    }
+
     fun addRoomMembers(roomId: String, userIds: ArrayList<String>, rdb: SQLiteDatabase, context: Context?) {
         for(u in userIds) {
-            val value: ContentValues = ContentValues().also {
-                it.put("room_id", roomId)
-                it.put("user_id", u)
-            }
-            val res: Long = rdb.insert("room_members", null, value)
-            if (res < 0) {
-                // error
-                Toast.makeText(context, "error in INSERT", Toast.LENGTH_SHORT).show()
+            getRoomMemberFromRoom(roomId, u, rdb) {
+                if(it.count == 0) { // 見つからなければ
+                    val value: ContentValues = ContentValues().also {
+                        it.put("room_id", roomId)
+                        it.put("user_id", u)
+                    }
+                    val res: Long = rdb.insert("room_members", null, value)
+                    if (res < 0) {
+                        // error
+                        Toast.makeText(context, "error in INSERT", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }

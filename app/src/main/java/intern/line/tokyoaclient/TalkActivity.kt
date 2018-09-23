@@ -58,6 +58,8 @@ class TalkActivity : AppCompatActivity() {
     private lateinit var talkHelper: TalkDBHelper
     private lateinit var sdb: SQLiteDatabase
     private lateinit var selfInfoHelper: SelfInfoDBHelper
+    private lateinit var nonFriendHelper: NonFriendDBHelper
+    private lateinit var nfdb: SQLiteDatabase
     private var roomMemberList: ArrayList<UserProfileWithImageUrl> = ArrayList()
 
 
@@ -71,9 +73,9 @@ class TalkActivity : AppCompatActivity() {
                 roomHelper = RoomDBHelper(this)
                 talkHelper = TalkDBHelper(this)
                 selfInfoHelper = SelfInfoDBHelper(this)
+                nonFriendHelper = NonFriendDBHelper(this)
             } catch (e: SQLiteException) {
-                Toast.makeText(this, "helper error: ${e.toString()}", Toast.LENGTH_SHORT).show()
-                println("helper error: ${e.toString()}")
+                debugLog(this, "helper error: ${e.toString()}")
             }
 
             try {
@@ -81,10 +83,10 @@ class TalkActivity : AppCompatActivity() {
                 rdb = roomHelper.writableDatabase
                 tdb = talkHelper.writableDatabase
                 sdb = selfInfoHelper.readableDatabase
-                Toast.makeText(this, "accessed to database", Toast.LENGTH_SHORT).show()
+                nfdb = nonFriendHelper.writableDatabase
+                // debugLog(this, "accessed to database")
             } catch (e: SQLiteException) {
-                Toast.makeText(this, "writable error: ${e.toString()}", Toast.LENGTH_SHORT).show()
-                println("writable error: ${e.toString()}")
+                debugLog(this, "writable error: ${e.toString()}")
             }
         } else {
             this.deleteDatabase(FriendDBHelper(this).databaseName)
@@ -97,7 +99,7 @@ class TalkActivity : AppCompatActivity() {
         userId = intent.getStringExtra("userId")
         roomId = intent.getStringExtra("roomId")
         isGroup = intent.getBooleanExtra("isGroup", false)
-        debugLog(this, "isGroup: $isGroup")
+        // debugLog(this, "isGroup: $isGroup")
 
         inputMethodManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         mainLayout = findViewById(R.id.main_layout) as ConstraintLayout
@@ -106,22 +108,33 @@ class TalkActivity : AppCompatActivity() {
             RoomLocalDBService().getRoomMembers(roomId, rdb, this) {
                 while(it.moveToNext()) {
                     val uid = it.getString(1)
-                    FriendLocalDBService().getFriend(it.getString(1), fdb, this) {
-                        try {
+                    if(uid.equals(userId)) { // 自分
+                        SelfInfoLocalDBService().getInfo(sdb) {
                             it.moveToNext()
                             val id = it.getString(0)
-                            if(roomMemberList.find { it.id.equals(id) } == null)
+                            if (roomMemberList.find { it.id.equals(id) } == null)
                                 roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
-                        } catch (e: CursorIndexOutOfBoundsException) {
-                            // フレンドで見つからなかったらそれは自分
-                            SelfInfoLocalDBService().getInfo(sdb) {
-                                try {
-                                    it.moveToNext()
-                                    val id = it.getString(0)
-                                    if(roomMemberList.find { it.id.equals(id) } == null)
-                                        roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
-                                } catch (e: CursorIndexOutOfBoundsException) { // 自分でもなかったらフレンドではない，知らない人
-                                    getUserInfo(uid)
+                        }
+                    } else {
+                        // フレンドを検索
+                        FriendLocalDBService().getFriend(uid, fdb, this) {
+                            try {
+                                it.moveToNext()
+                                val id = it.getString(0)
+                                if (roomMemberList.find { it.id.equals(id) } == null)
+                                    roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
+                            } catch (e: CursorIndexOutOfBoundsException) {
+                                // フレンドで見つからなかったらそれは知らない人
+                                NonFriendLocalDBService().getFriend(uid, nfdb, this) {
+                                    try {
+                                        it.moveToNext()
+                                        val id = it.getString(0)
+                                        if (roomMemberList.find { it.id.equals(id) } == null)
+                                            roomMemberList.add(UserProfileWithImageUrl(it.getString(0), it.getString(1), it.getString(2)))
+                                    } catch (e: CursorIndexOutOfBoundsException) {
+                                        // まだlocalDBにない
+                                        getUserInfo(uid)
+                                    }
                                 }
                             }
                         }
@@ -204,9 +217,10 @@ class TalkActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     for(rm in it) {
-                        val target = roomMemberList.find{ it.id.equals(rm.uid) }
-                        if(target == null)
+                        if(roomMemberList.find{ it.id.equals(rm.uid) } == null) {
+                            // debugLog(this, "get member: ${rm.uid}")
                             getUserInfo(rm.uid)
+                        }
                     }
                 }, {
                     debugLog(this, "get room member failed: $it")
@@ -368,6 +382,8 @@ class TalkActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
+                    NonFriendLocalDBService().addFriend(uid, name, it.pathToFile, nfdb, this)
+                    RoomLocalDBService().addRoomMembers(roomId, arrayListOf(uid), rdb, this)
                     roomMemberList.add(UserProfileWithImageUrl(uid, name, it.pathToFile))
                 }, {
                     debugLog(this, "get image url failed: $it")
