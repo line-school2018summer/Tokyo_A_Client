@@ -8,10 +8,12 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.Adapter.NameComparator
+import intern.line.tokyoaclient.Adapter.NameComparatorSelection
 import intern.line.tokyoaclient.Adapter.UserListAdapterWithImageSelection
 import intern.line.tokyoaclient.HttpConnection.friendService
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
+import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrlSelection
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import intern.line.tokyoaclient.LocalDataBase.FriendLocalDBService
@@ -29,9 +31,9 @@ class CreateGroupActivity : AppCompatActivity() {
     private lateinit var friendList: ListView
     private lateinit var counter: TextView
     private var count = 0
-    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrl>
+    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrlSelection>
     private var adapter: UserListAdapterWithImageSelection? = null
-    private lateinit var data: ArrayList<UserProfileWithImageUrl>
+    private lateinit var data: ArrayList<UserProfileWithImageUrlSelection>
     // localDB
     private lateinit var fdb: SQLiteDatabase
     private lateinit var helper: FriendDBHelper
@@ -89,23 +91,16 @@ class CreateGroupActivity : AppCompatActivity() {
                     val roomMemberNames = intent.getStringArrayExtra("roomMemberNames")
                     val roomMemberIcons = intent.getStringArrayExtra("roomMemberIcons")
                     for (i in 0..roomMemberIds.size - 1) {
-                        adapter?.add(UserProfileWithImageUrl(
+                        adapter?.add(UserProfileWithImageUrlSelection(
                                 id = roomMemberIds[i],
                                 name = roomMemberNames[i],
-                                pathToFile = roomMemberIcons[i]
+                                pathToFile = roomMemberIcons[i],
+                                isChecked = true
                         ))
-                    }
-                    /*
-                    for (i in 0..roomMemberIds.size - 1) {
-                        val view = adapter?.getView(i, null, null)
-                        val check = view!!.findViewById<CheckedTextView>(R.id.nameTextView)
-                        check.isChecked = true
-                        check.toggle()
                     }
                     count = data.size
                     counter.text = count.toString()
                     selectedUsers.addAll(data)
-                    */
                 } catch (e: Exception) {
                     debugLog(this, "intent error: $e")
                 }
@@ -142,7 +137,7 @@ class CreateGroupActivity : AppCompatActivity() {
     private fun getFriendByLocalDB() {
         adapter?.clear() // 空にする
         FriendLocalDBService().getAllFriend(fdb, this) {
-            adapter?.add(UserProfileWithImageUrl(
+            adapter?.add(UserProfileWithImageUrlSelection(
                     id = it.getString(0),
                     name = it.getString(1),
                     pathToFile = it.getString(2)
@@ -182,22 +177,22 @@ class CreateGroupActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.pathToFile != "") {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
+                        adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, it.pathToFile))
                     } else {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                        adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, "default.jpg"))
                     }
-                    Collections.sort(data, NameComparator())
+                    Collections.sort(data, NameComparatorSelection())
                 }, {
-                    adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
-                    Collections.sort(data, NameComparator())
+                    adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, "default.jpg"))
+                    Collections.sort(data, NameComparatorSelection())
                     debugLog(this, "get image url failed: $it")
                 })
     }
 
-    private fun createGroup(users: ArrayList<UserProfileWithImageUrl>) {
+    private fun createGroup(users: ArrayList<UserProfileWithImageUrlSelection>) {
         val intent = Intent(this, ConfigureGroupActivity::class.java)
         intent.putExtra("userId", userId)
-        Collections.sort(users, NameComparator())
+        Collections.sort(users, NameComparatorSelection())
         intent.putExtra("userIds", users.map{it -> it.id}.toTypedArray())
         intent.putExtra("userNames", users.map{it -> it.name}.toTypedArray())
         intent.putExtra("userIcons", users.map{it -> it.pathToFile}.toTypedArray())

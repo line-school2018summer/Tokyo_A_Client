@@ -142,7 +142,6 @@ class TalkListFragment : Fragment() {
         RoomLocalDBService().getAllRoom(rdb, context) { cursor ->
             val allUpdated = data.find{ it.roomId.equals(cursor.getString(0)) && it.roomName.equals(cursor.getString(1)) && it.pathToFile.equals(cursor.getString(2))} // 変更なし
             val exists = data.find{ it.roomId.equals(cursor.getString(0)) } // 存在はする
-
             if(exists != null && allUpdated == null) {
                 exists.roomName = cursor.getString(1)
                 exists.pathToFile = cursor.getString(2)
@@ -242,10 +241,9 @@ class TalkListFragment : Fragment() {
                             getLatestTalkWithLongPolling(roomId, sinceTalkId)
                     }
                 }, {
-                    debugLog(context, "get talk failed: $it")
+                    // debugLog(context, "get talk failed: $it")
                     if(alive)
                         getLatestTalkWithLongPolling(roomId, sinceTalkId)
-                    return@subscribe // このスレッドは終了
                 })
     }
 

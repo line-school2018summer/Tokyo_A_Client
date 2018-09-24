@@ -19,6 +19,7 @@ import intern.line.tokyoaclient.HttpConnection.*
 import intern.line.tokyoaclient.HttpConnection.model.Room
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.LocalDataBase.*
+import kotlinx.android.synthetic.main.fragment_setting.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.sql.Timestamp
@@ -320,14 +321,16 @@ class FriendListFragment : Fragment() {
                         } else {
                             groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
                         }
-                        if(USE_LOCAL_DB)
+                        if(USE_LOCAL_DB) {
                             RoomLocalDBService().addRoom(roomId, roomName, pathToFileStr, room.createdAt, room.isGroup, -1, "", Timestamp(0L), rdb, context)
+                            RoomLocalDBService().updateRoomInfo(roomId, roomName, pathToFileStr, rdb, context)
+                        }
                     }
                     Collections.sort(groupData, NameComparator())
                 }, {
                     debugLog(context, "get image url failed: $it")
                     // groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
-                    Collections.sort(groupData, NameComparator())
+                    // Collections.sort(groupData, NameComparator())
                 })
     }
 

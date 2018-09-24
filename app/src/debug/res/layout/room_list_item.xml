@@ -25,10 +25,8 @@
 
     <TextView
         android:id="@+id/textTextView"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="50dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginStart="60dp"
         android:gravity="center_vertical"
         android:text="hogehogehogehogehogehogehogehogehogehogehogehoge"
         android:textColor="@color/colorText"
@@ -45,6 +43,6 @@
         android:textColor="@color/colorText"
         android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="@+id/textTextView"
-        app:layout_constraintStart_toEndOf="@+id/textTextView" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
