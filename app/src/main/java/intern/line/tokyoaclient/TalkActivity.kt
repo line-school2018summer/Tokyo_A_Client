@@ -191,6 +191,7 @@ class TalkActivity : AppCompatActivity() {
         if(USE_LOCAL_DB) // 履歴から追加
             getMessageByLocalDB(roomId)
         talkList.setAdapter(adapter)
+        talkList.setSelection(data.size) // 最下部にfocusする
         println("Room open sinceTalkId: $sinceTalkId")
 
         getMessageWithLongPolling()
