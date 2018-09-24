@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:background="@color/colorLayout"
-        android:gravity="center"
+        android:gravity="center_vertical"
         android:hint="名前"
         android:textColor="@color/colorText"
         android:textSize="30sp"
@@ -57,7 +57,19 @@
         android:text="+"
         android:textColor="@color/colorText"
         android:textSize="20sp"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/addGroupButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:text="◯"
+        android:textColor="@color/colorText"
+        android:textSize="20sp"
+        android:gravity="center"
+        app:layout_constraintEnd_toStartOf="@+id/addMemberButton"
         app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

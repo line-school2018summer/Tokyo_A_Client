@@ -19,14 +19,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DebugActivity" />
+        <activity android:name=".Debug.DebugActivity" />
         <activity android:name=".MainPageActivity" />
         <activity android:name=".TalkActivity" />
-        <activity android:name=".ImageDebugActivity" />
-        <activity android:name=".FriendListActivity" />
+        <activity android:name=".Debug.ImageDebugActivity" />
+        <activity android:name=".NoUse.FriendListActivity" />
         <activity android:name=".AddFriendActivity" />
         <activity android:name=".TabLayoutActivity" />
-        <activity android:name=".localDBDebugActivity" />
+        <activity android:name=".Debug.localDBDebugActivity" />
         <activity android:name=".EditNameActivity" />
         <activity android:name=".EditIconActivity" />
         <activity android:name=".CreateGroupActivity" />

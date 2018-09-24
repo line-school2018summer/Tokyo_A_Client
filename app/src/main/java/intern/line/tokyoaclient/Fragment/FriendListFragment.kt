@@ -19,6 +19,7 @@ import intern.line.tokyoaclient.HttpConnection.*
 import intern.line.tokyoaclient.HttpConnection.model.Room
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
 import intern.line.tokyoaclient.LocalDataBase.*
+import kotlinx.android.synthetic.main.fragment_setting.*
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import java.sql.Timestamp
@@ -40,6 +41,7 @@ class FriendListFragment : Fragment() {
     private lateinit var sdb: SQLiteDatabase
     private lateinit var selfInfoHelper: SelfInfoDBHelper
 
+    private val CREATE_NEW_GROUP = 1
     private val REQUEST_ADD_FRIEND = 1 // request code
 
     override fun onCreate(savedInstanceState: Bundle?) { // 最初の1回だけ呼ばれる
@@ -259,8 +261,14 @@ class FriendListFragment : Fragment() {
                         } else {
                             friendAdapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
                         }
-                        if(USE_LOCAL_DB)
+                        if(USE_LOCAL_DB) {
                             FriendLocalDBService().addFriend(idStr, nameStr, pathToFileStr, fdb, context)
+                            val friendId = idStr
+                            val num1: Int = Math.abs(UUID.nameUUIDFromBytes(userId.toByteArray()).hashCode())
+                            val num2: Int = Math.abs(UUID.nameUUIDFromBytes(friendId.toByteArray()).hashCode())
+                            val roomId: String = (num1 + num2).toString()
+                            RoomLocalDBService().updateRoomInfo(roomId, nameStr, pathToFileStr, rdb, context)
+                        }
                     }
                     Collections.sort(friendData, NameComparator())
                 }, {
@@ -313,14 +321,16 @@ class FriendListFragment : Fragment() {
                         } else {
                             groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
                         }
-                        if(USE_LOCAL_DB)
+                        if(USE_LOCAL_DB) {
                             RoomLocalDBService().addRoom(roomId, roomName, pathToFileStr, room.createdAt, room.isGroup, -1, "", Timestamp(0L), rdb, context)
+                            RoomLocalDBService().updateRoomInfo(roomId, roomName, pathToFileStr, rdb, context)
+                        }
                     }
                     Collections.sort(groupData, NameComparator())
                 }, {
                     debugLog(context, "get image url failed: $it")
                     // groupAdapter?.addAll(UserProfileWithImageUrl(roomId, roomName, "default.jpg"))
-                    Collections.sort(groupData, NameComparator())
+                    // Collections.sort(groupData, NameComparator())
                 })
     }
 
@@ -407,6 +417,7 @@ class FriendListFragment : Fragment() {
     private fun goToCreateGroup(userId: String) {
         val intent = Intent(context, CreateGroupActivity::class.java)
         intent.putExtra("userId", userId)
+        intent.putExtra("mode", CREATE_NEW_GROUP)
         startActivity(intent)
     }
 

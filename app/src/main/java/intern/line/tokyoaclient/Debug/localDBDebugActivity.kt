@@ -1,4 +1,4 @@
-package intern.line.tokyoaclient
+package intern.line.tokyoaclient.Debug
 
 import android.content.ContentValues
 import android.database.Cursor
@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteException
 import intern.line.tokyoaclient.Adapter.TestDataAdapter
 import intern.line.tokyoaclient.HttpConnection.model.Talk
 import intern.line.tokyoaclient.LocalDataBase.TalkDBHelper
+import intern.line.tokyoaclient.R
 import java.sql.Time
 
 class localDBDebugActivity : AppCompatActivity() {

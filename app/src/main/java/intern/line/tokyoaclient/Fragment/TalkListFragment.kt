@@ -62,7 +62,7 @@ class TalkListFragment : Fragment() {
                 fdb = friendHelper.writableDatabase
                 rdb = roomHelper.writableDatabase
                 tdb = talkHelper.writableDatabase
-                Toast.makeText(context, "accessed to database", Toast.LENGTH_SHORT).show()
+                // debugLog(context, "accessed to database")
             } catch (e: SQLiteException) {
                 debugLog(context, "writable error: ${e.toString()}")
             }
@@ -108,6 +108,7 @@ class TalkListFragment : Fragment() {
         super.onResume()
         alive = true
         first = true
+        updateRoomByLocalDB()
         timer = Timer().schedule(0, 300000, { getRoom(userId) })
     }
 
@@ -135,6 +136,18 @@ class TalkListFragment : Fragment() {
             ))
         }
         adapter?.notifyDataSetChanged()
+    }
+
+    private fun updateRoomByLocalDB() {
+        RoomLocalDBService().getAllRoom(rdb, context) { cursor ->
+            val allUpdated = data.find{ it.roomId.equals(cursor.getString(0)) && it.roomName.equals(cursor.getString(1)) && it.pathToFile.equals(cursor.getString(2))} // 変更なし
+            val exists = data.find{ it.roomId.equals(cursor.getString(0)) } // 存在はする
+            if(exists != null && allUpdated == null) {
+                exists.roomName = cursor.getString(1)
+                exists.pathToFile = cursor.getString(2)
+                adapter?.notifyDataSetChanged()
+            }
+        }
     }
 
     // userが所属するroomを取得
@@ -228,10 +241,9 @@ class TalkListFragment : Fragment() {
                             getLatestTalkWithLongPolling(roomId, sinceTalkId)
                     }
                 }, {
-                    debugLog(context, "get talk failed: $it")
+                    // debugLog(context, "get talk failed: $it")
                     if(alive)
                         getLatestTalkWithLongPolling(roomId, sinceTalkId)
-                    return@subscribe // このスレッドは終了
                 })
     }
 
@@ -250,33 +262,44 @@ class TalkListFragment : Fragment() {
                         roomWithImageUrlAndLatestTalk.isGroup = true
                         roomWithImageUrlAndLatestTalk.createdAt = it.createdAt
                         roomWithImageUrlAndLatestTalk.roomName = it.roomName
-                        roomWithImageUrlAndLatestTalk.pathToFile = "default.jpg"
-                        val target = searchDataWithRoomId(roomWithImageUrlAndLatestTalk.roomId)
-                        if(target == null) {
-                            print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
-                            adapter?.add(roomWithImageUrlAndLatestTalk)
-                            Collections.sort(data, RoomComparator())
-                            adapter?.notifyDataSetChanged()
-                        }
-
-                        if(USE_LOCAL_DB) {
-                            RoomLocalDBService().addRoom(it.roomId,
-                                    it.roomName,
-                                    "default.jpg",
-                                    it.createdAt,
-                                    it.isGroup,
-                                    sinceTalkId,
-                                    roomWithImageUrlAndLatestTalk.latestTalk,
-                                    roomWithImageUrlAndLatestTalk.latestTalkTime,
-                                    rdb, context)
-                            debugLog(context, "added room to localDB: roomid is ${it.roomId}")
-                        }
+                        getRoomIcon(roomWithImageUrlAndLatestTalk, sinceTalkId)
                     } else { // 個人チャット
                         roomWithImageUrlAndLatestTalk.isGroup = false
                         getMembers(roomWithImageUrlAndLatestTalk, sinceTalkId)
                     }
                 }, {
                     debugLog(context, "get room failed: $it")
+                })
+    }
+
+    private fun getRoomIcon(roomWithImageUrlAndLatestTalk: RoomWithImageUrlAndLatestTalk, sinceTalkId: Long) {
+        imageService.getImageUrlById(roomWithImageUrlAndLatestTalk.roomId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    roomWithImageUrlAndLatestTalk.pathToFile = it.pathToFile
+                    val target = searchDataWithRoomId(roomWithImageUrlAndLatestTalk.roomId)
+                    if(target == null) {
+                        print("(1) add room; roomId = ${roomWithImageUrlAndLatestTalk.roomId}\n")
+                        adapter?.add(roomWithImageUrlAndLatestTalk)
+                        Collections.sort(data, RoomComparator())
+                        adapter?.notifyDataSetChanged()
+                    }
+
+                    if(USE_LOCAL_DB) {
+                        RoomLocalDBService().addRoom(roomWithImageUrlAndLatestTalk.roomId,
+                                roomWithImageUrlAndLatestTalk.roomName,
+                                "default.jpg",
+                                it.createdAt,
+                                roomWithImageUrlAndLatestTalk.isGroup,
+                                sinceTalkId,
+                                roomWithImageUrlAndLatestTalk.latestTalk,
+                                roomWithImageUrlAndLatestTalk.latestTalkTime,
+                                rdb, context)
+                        debugLog(context, "added room to localDB: roomid is ${roomWithImageUrlAndLatestTalk.roomId}")
+                    }
+                }, {
+                    debugLog(context, "get image url failed: $it")
                 })
     }
 

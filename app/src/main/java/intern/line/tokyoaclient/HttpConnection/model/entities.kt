@@ -55,13 +55,20 @@ data class UserProfileWithImageUrl(
         var pathToFile: String = "default.jpg"
 )
 
+data class UserProfileWithImageUrlSelection(
+        var id: String = "default",
+        var name: String = "unknown",
+        var pathToFile: String = "default.jpg",
+        var isChecked: Boolean = false
+)
+
 data class TalkWithImageUrl(
         var talkId: Long = -1,
         var senderName: String = "sender",
         var roomId: String = "room0",
         var text: String = "Hello, world!",
         var numRead: Long = 0,
-        var pathToFile: String,
+        var pathToFile: String = "default.jpg",
         var createdAt: Timestamp = Timestamp(0L),
         var updatedAt: Timestamp = Timestamp(0L)
 )
@@ -69,7 +76,7 @@ data class TalkWithImageUrl(
 data class RoomWithImageUrlAndLatestTalk(
         var roomId: String = "room0",
         var roomName: String = "default",
-        var pathToFile: String,
+        var pathToFile: String = "default.jpg",
         var latestTalk: String = "hoge",
         var latestTalkTime: Timestamp = Timestamp(0L),
         var sinceTalkId: Long = -1,

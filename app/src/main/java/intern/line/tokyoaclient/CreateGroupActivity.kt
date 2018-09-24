@@ -8,15 +8,18 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.Adapter.NameComparator
+import intern.line.tokyoaclient.Adapter.NameComparatorSelection
 import intern.line.tokyoaclient.Adapter.UserListAdapterWithImageSelection
 import intern.line.tokyoaclient.HttpConnection.friendService
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
+import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrlSelection
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
 import intern.line.tokyoaclient.LocalDataBase.FriendLocalDBService
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
+import java.security.cert.CRLException
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -24,16 +27,19 @@ import kotlin.collections.ArrayList
 class CreateGroupActivity : AppCompatActivity() {
 
     private var userId: String = "default"
+    private var mode: Int = -1
     private lateinit var friendList: ListView
     private lateinit var counter: TextView
     private var count = 0
-    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrl>
+    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrlSelection>
     private var adapter: UserListAdapterWithImageSelection? = null
-    private lateinit var data: ArrayList<UserProfileWithImageUrl>
+    private lateinit var data: ArrayList<UserProfileWithImageUrlSelection>
     // localDB
     private lateinit var fdb: SQLiteDatabase
     private lateinit var helper: FriendDBHelper
 
+    private val CREATE_NEW_GROUP = 1
+    private val CREATE_ADDITIONAL_GROUP = 2
     private val REQUEST_CREATE_GROUP = 1 // request code
 
 
@@ -50,6 +56,7 @@ class CreateGroupActivity : AppCompatActivity() {
         friendList.setAdapter(adapter)
 
         userId = intent.getStringExtra("userId")
+        mode = intent.getIntExtra("mode", -1)
 
         if (USE_LOCAL_DB) {
             try {
@@ -70,10 +77,34 @@ class CreateGroupActivity : AppCompatActivity() {
             this.deleteDatabase(FriendDBHelper(this).databaseName)
         }
 
-        if (USE_LOCAL_DB) {
-            getFriendByLocalDB()
-        } else {
-            getFriend(userId)
+        when {
+            mode <= 1 -> {
+                if (USE_LOCAL_DB) {
+                    getFriendByLocalDB()
+                } else {
+                    getFriend(userId)
+                }
+            }
+            mode == 2 -> {
+                try {
+                    val roomMemberIds = intent.getStringArrayExtra("roomMemberIds")
+                    val roomMemberNames = intent.getStringArrayExtra("roomMemberNames")
+                    val roomMemberIcons = intent.getStringArrayExtra("roomMemberIcons")
+                    for (i in 0..roomMemberIds.size - 1) {
+                        adapter?.add(UserProfileWithImageUrlSelection(
+                                id = roomMemberIds[i],
+                                name = roomMemberNames[i],
+                                pathToFile = roomMemberIcons[i],
+                                isChecked = true
+                        ))
+                    }
+                    count = data.size
+                    counter.text = count.toString()
+                    selectedUsers.addAll(data)
+                } catch (e: Exception) {
+                    debugLog(this, "intent error: $e")
+                }
+            }
         }
 
         val createButton = findViewById(R.id.createButton) as Button
@@ -106,7 +137,7 @@ class CreateGroupActivity : AppCompatActivity() {
     private fun getFriendByLocalDB() {
         adapter?.clear() // 空にする
         FriendLocalDBService().getAllFriend(fdb, this) {
-            adapter?.add(UserProfileWithImageUrl(
+            adapter?.add(UserProfileWithImageUrlSelection(
                     id = it.getString(0),
                     name = it.getString(1),
                     pathToFile = it.getString(2)
@@ -146,22 +177,22 @@ class CreateGroupActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.pathToFile != "") {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
+                        adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, it.pathToFile))
                     } else {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                        adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, "default.jpg"))
                     }
-                    Collections.sort(data, NameComparator())
+                    Collections.sort(data, NameComparatorSelection())
                 }, {
-                    adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
-                    Collections.sort(data, NameComparator())
+                    adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, "default.jpg"))
+                    Collections.sort(data, NameComparatorSelection())
                     debugLog(this, "get image url failed: $it")
                 })
     }
 
-    private fun createGroup(users: ArrayList<UserProfileWithImageUrl>) {
+    private fun createGroup(users: ArrayList<UserProfileWithImageUrlSelection>) {
         val intent = Intent(this, ConfigureGroupActivity::class.java)
         intent.putExtra("userId", userId)
-        Collections.sort(users, NameComparator())
+        Collections.sort(users, NameComparatorSelection())
         intent.putExtra("userIds", users.map{it -> it.id}.toTypedArray())
         intent.putExtra("userNames", users.map{it -> it.name}.toTypedArray())
         intent.putExtra("userIcons", users.map{it -> it.pathToFile}.toTypedArray())

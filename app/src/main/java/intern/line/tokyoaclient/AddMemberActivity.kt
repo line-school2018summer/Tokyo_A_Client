@@ -9,10 +9,12 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.widget.*
 import intern.line.tokyoaclient.Adapter.NameComparator
+import intern.line.tokyoaclient.Adapter.NameComparatorSelection
 import intern.line.tokyoaclient.Adapter.UserListAdapterWithImageSelection
 import intern.line.tokyoaclient.HttpConnection.friendService
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrl
+import intern.line.tokyoaclient.HttpConnection.model.UserProfileWithImageUrlSelection
 import intern.line.tokyoaclient.HttpConnection.roomService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.FriendDBHelper
@@ -32,9 +34,9 @@ class AddMemberActivity : AppCompatActivity() {
     private lateinit var friendList: ListView
     private lateinit var counter: TextView
     private var count = 0
-    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrl>
+    private lateinit var selectedUsers: ArrayList<UserProfileWithImageUrlSelection>
     private var adapter: UserListAdapterWithImageSelection? = null
-    private lateinit var data: ArrayList<UserProfileWithImageUrl>
+    private lateinit var data: ArrayList<UserProfileWithImageUrlSelection>
     private lateinit var roomMemberIdData: ArrayList<String>
     // localDB
     private lateinit var fdb: SQLiteDatabase
@@ -131,7 +133,7 @@ class AddMemberActivity : AppCompatActivity() {
         adapter?.clear() // 空にする
         FriendLocalDBService().getAllFriend(fdb, this) {
             if(it.getString(0) !in roomMemberIdData)
-            adapter?.add(UserProfileWithImageUrl(
+            adapter?.add(UserProfileWithImageUrlSelection(
                     id = it.getString(0),
                     name = it.getString(1),
                     pathToFile = it.getString(2)
@@ -171,14 +173,14 @@ class AddMemberActivity : AppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     if (it.pathToFile != "") {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, it.pathToFile))
+                        adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, it.pathToFile))
                     } else {
-                        adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
+                        adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, "default.jpg"))
                     }
-                    Collections.sort(data, NameComparator())
+                    Collections.sort(data, NameComparatorSelection())
                 }, {
-                    adapter?.addAll(UserProfileWithImageUrl(idStr, nameStr, "default.jpg"))
-                    Collections.sort(data, NameComparator())
+                    adapter?.addAll(UserProfileWithImageUrlSelection(idStr, nameStr, "default.jpg"))
+                    Collections.sort(data, NameComparatorSelection())
                     debugLog(this, "get image url failed: $it")
                 })
     }

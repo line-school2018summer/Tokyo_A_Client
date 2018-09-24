@@ -13,6 +13,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import intern.line.tokyoaclient.Debug.localDBDebugActivity
 import intern.line.tokyoaclient.HttpConnection.*
 import intern.line.tokyoaclient.LocalDataBase.*
 import kotlinx.android.synthetic.main.activity_main.*
