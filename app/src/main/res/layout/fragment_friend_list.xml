@@ -15,7 +15,7 @@
         android:layout_height="match_parent">
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/editIconImageView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
@@ -34,8 +34,8 @@
             android:layout_marginRight="24dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="32dp"
-            app:layout_constraintBottom_toTopOf="@+id/friendListTextView"
-            app:layout_constraintEnd_toStartOf="@+id/imageView"
+            app:layout_constraintBottom_toTopOf="@+id/BlankTextView"
+            app:layout_constraintEnd_toStartOf="@+id/editIconImageView"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -56,42 +56,62 @@
             android:text="名前"
             android:textColor="@color/colorWhite"
             android:textSize="25sp"
-            app:layout_constraintBottom_toTopOf="@+id/friendListTextView"
+            app:layout_constraintBottom_toTopOf="@+id/BlankTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/icon"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/friendListTextView"
+            android:id="@+id/BlankTextView"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="32dp"
             android:background="@color/colorWhite"
-            android:gravity="center_vertical"
-            android:paddingLeft="60dp"
-            android:text="Friends"
-            android:textColor="@color/colorText"
-            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@+id/friendList"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/icon"
-            tools:text="Friends" />
+            app:layout_constraintTop_toBottomOf="@+id/icon" />
+
+        <TextView
+            android:id="@+id/BlankTextView2"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:background="@color/colorWhite"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/friendList" />
+
+        <TextView
+            android:id="@+id/friendListTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="Friends"
+            android:textSize="18sp"
+            android:textColor="@color/colorText"
+            android:background="@drawable/border_bottom"
+            app:layout_constraintBottom_toTopOf="@+id/friendList"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/BlankTextView" />
 
         <TextView
             android:id="@+id/groupListTextView"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/colorWhite"
-            android:gravity="center_vertical"
-            android:paddingLeft="60dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
             android:text="Groups"
-            android:textColor="@color/colorText"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textColor="@color/colorText"
+            android:background="@drawable/border_bottom"
+            app:layout_constraintBottom_toTopOf="@+id/groupList"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/friendList"
-            tools:text="Groups" />
+            app:layout_constraintTop_toBottomOf="@+id/friendList" />
 
         <ListView
             android:id="@+id/friendList"
@@ -101,7 +121,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/friendListTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/BlankTextView" />
 
         <ListView
             android:id="@+id/groupList"
@@ -109,11 +129,11 @@
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
             android:background="@color/colorWhite"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView"
+            app:layout_constraintBottom_toBottomOf="@+id/editIconImageView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/groupListTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/BlankTextView2" />
 
         <ImageView
             android:id="@+id/addFriendButton"
@@ -126,7 +146,7 @@
             android:layout_marginStart="8dp"
             android:padding="10dp"
             android:src="@drawable/add_friend_icon"
-            app:layout_constraintBottom_toTopOf="@+id/friendListTextView"
+            app:layout_constraintBottom_toTopOf="@+id/BlankTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ownNameText"
             app:layout_constraintTop_toBottomOf="@+id/createGroupButton" />
@@ -145,6 +165,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ownNameText"
             app:layout_constraintTop_toTopOf="parent" />
+
 
     </android.support.constraint.ConstraintLayout>
 
