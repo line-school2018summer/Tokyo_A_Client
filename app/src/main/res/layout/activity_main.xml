@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:windowSoftInputMode="adjustPan" >
 
     <EditText
         android:id="@+id/nameText"
         android:layout_width="290dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="41dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="47dp"
         android:layout_marginLeft="47dp"
         android:layout_marginRight="47dp"
         android:layout_marginStart="47dp"
-        android:layout_marginTop="18dp"
         android:ems="10"
-        android:hint="(サインアップ時はユーザ名を入力)"
+        android:hint="User name(Sign up) "
         android:inputType="textEmailAddress"
         android:textColor="@color/colorText"
         app:layout_constraintBottom_toTopOf="@+id/signin"
@@ -29,15 +30,14 @@
     <EditText
         android:id="@+id/passwordText"
         android:layout_width="290dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="47dp"
         android:layout_marginLeft="47dp"
         android:layout_marginRight="47dp"
         android:layout_marginStart="47dp"
-        android:layout_marginTop="26dp"
         android:ems="10"
-        android:hint="パスワード"
+        android:hint="Password"
         android:inputType="textPassword"
         android:textColor="@color/colorText"
         app:layout_constraintBottom_toTopOf="@+id/nameText"
@@ -45,64 +45,70 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mailText" />
 
-    <Button
-        android:id="@+id/signin"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="232dp"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:text="サインイン"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        android:id="@+id/signup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="155dp"
-        android:layout_marginEnd="148dp"
-        android:layout_marginLeft="148dp"
-        android:layout_marginRight="148dp"
-        android:layout_marginStart="148dp"
-        android:layout_marginTop="29dp"
-        android:text="サインアップ"
-        android:textColor="@color/colorText"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/signin" />
-
     <EditText
         android:id="@+id/mailText"
         android:layout_width="290dp"
         android:layout_height="40dp"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="47dp"
         android:layout_marginLeft="47dp"
         android:layout_marginRight="47dp"
         android:layout_marginStart="47dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="メールアドレス"
+        android:hint="E-mail"
         android:inputType="textEmailAddress"
         android:textColor="@color/colorText"
         app:layout_constraintBottom_toTopOf="@+id/passwordText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+
+    <Button
+        android:id="@+id/signin"
+        android:layout_width="120dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginLeft="60dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/button_style"
+        android:text="Sign in"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toStartOf="@+id/signup"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameText" />
+
+    <Button
+        android:id="@+id/signup"
+        android:layout_width="120dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="60dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/button_style"
+        android:text="Sign up"
+        android:textColor="@color/colorWhite"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/signin"
+        app:layout_constraintTop_toBottomOf="@+id/nameText" />
 
     <Button
         android:id="@+id/localDBButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="14dp"
+        android:layout_marginRight="14dp"
         android:text="ローカルデータベース使用"
-        app:layout_constraintBottom_toTopOf="@+id/noLocalDBButton"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/noLocalDBButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/noLocalDBButton"
@@ -111,4 +117,20 @@
         android:text="ローカルデータベース非使用"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
+        android:layout_marginBottom="17dp"
+        android:layout_marginEnd="95dp"
+        android:layout_marginLeft="95dp"
+        android:layout_marginRight="95dp"
+        android:layout_marginStart="95dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/mailText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_bg" />
 </android.support.constraint.ConstraintLayout>

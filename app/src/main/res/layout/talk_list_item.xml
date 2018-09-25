@@ -1,48 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/icon"
-        android:layout_width="60dp"
-        android:layout_height="60dp" />
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/nameTextView"
-        android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:layout_marginLeft="60dp"
-        android:layout_marginStart="60dp"
+        android:layout_width="0dp"
+        android:layout_height="32dp"
         android:gravity="center_vertical"
+        android:padding="4dp"
         android:text="Friend_name"
         android:textColor="@color/colorText"
-        android:textSize="15sp"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textTextView"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="51dp"
         android:gravity="center_vertical"
+        android:padding="4dp"
         android:text="hogehogehogehogehogehogehogehogehogehogehogehoge"
         android:textColor="@color/colorText"
-        android:textSize="20sp"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/timeTextView"
         app:layout_constraintStart_toEndOf="@+id/icon"
         app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
 
     <TextView
         android:id="@+id/timeTextView"
         android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="48dp"
+        android:gravity="bottom|right"
+        android:padding="4dp"
         android:text="time"
         android:textColor="@color/colorText"
-        android:textSize="15sp"
-        app:layout_constraintBottom_toBottomOf="@+id/textTextView"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nameTextView" />
 
 </android.support.constraint.ConstraintLayout>

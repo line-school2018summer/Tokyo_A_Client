@@ -39,9 +39,9 @@ class MyPagerAdapter(fm: FragmentManager, uid: String) : FragmentPagerAdapter(fm
 
     override fun getPageTitle(position: Int): CharSequence {
         return when (position) {
-            0 -> "フレンドリスト"
-            1 -> "トークリスト"
-            else -> "設定"
+            0 -> "Contacts"
+            1 -> "Chats"
+            else -> "Settings"
         }
     }
 }

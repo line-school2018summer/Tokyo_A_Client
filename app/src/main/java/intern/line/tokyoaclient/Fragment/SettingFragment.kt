@@ -9,12 +9,10 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.bumptech.glide.Glide
 import intern.line.tokyoaclient.*
+import intern.line.tokyoaclient.Adapter.SettingListAdapter
 import intern.line.tokyoaclient.HttpConnection.imageService
 import intern.line.tokyoaclient.HttpConnection.userProfileService
 import intern.line.tokyoaclient.LocalDataBase.SelfInfoDBHelper
@@ -53,26 +51,35 @@ class SettingFragment : Fragment() {
     }
 
     private lateinit var v: View
-    private lateinit var editNameButton: Button
-    private lateinit var logoutButton: Button
+    private lateinit var editIconButton: ImageView
+    private lateinit var settingList: ListView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_setting, container, false)
-        editNameButton = v.findViewById(R.id.editNameButton) as Button
-        editNameButton.setOnClickListener {
-            goNameEdit()
-        }
+
 
         editIcon = v.findViewById(R.id.editIcon) as ImageView
         editIcon.setOnClickListener {
             goIconEdit()
         }
 
-        logoutButton = v.findViewById(R.id.logoutButton) as Button
-        logoutButton.setOnClickListener {
-            logout()
+        editIconButton =  v.findViewById(R.id.editIconImageView) as ImageView
+        editIconButton.setOnClickListener {
+            goIconEdit()
+        }
+
+        settingList = v.findViewById(R.id.settingListView) as ListView
+        val dataArray = listOf("Rename","Log out")
+        val settingAdapter = SettingListAdapter(context!!, dataArray)
+        settingList.adapter = settingAdapter
+        settingList.setOnItemClickListener { _, view, _, _ ->
+            val txt = view.findViewById<TextView>(R.id.settingTextView).text.toString()
+            when(txt){
+                "Rename" -> goNameEdit()
+                "Log out" -> logout()
+            }
         }
 
         return v

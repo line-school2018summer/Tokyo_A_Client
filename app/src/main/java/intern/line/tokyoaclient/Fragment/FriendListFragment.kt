@@ -89,8 +89,8 @@ class FriendListFragment : Fragment() {
     private lateinit var v: View
     private lateinit var friendList: ListView
     private lateinit var groupList: ListView
-    private lateinit var addFriendButton: Button
-    private lateinit var createGroupButton: Button
+    private lateinit var addFriendButton: ImageView
+    private lateinit var createGroupButton: ImageView
     private lateinit var userIconImageView: ImageView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -98,8 +98,8 @@ class FriendListFragment : Fragment() {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_friend_list, container, false)
 
-        addFriendButton = v.findViewById(R.id.addFriendButton) as Button
-        createGroupButton = v.findViewById(R.id.createGroupButton) as Button
+        addFriendButton = v.findViewById(R.id.addFriendButton) as ImageView
+        createGroupButton = v.findViewById(R.id.createGroupButton) as ImageView
         friendList = v.findViewById(R.id.friendList) as ListView
         groupList = v.findViewById(R.id.groupList) as ListView
         userIconImageView = v.findViewById(R.id.icon) as ImageView

@@ -42,7 +42,7 @@ class EditIconActivity : AppCompatActivity() {
         setContentView(R.layout.activity_edit_icon)
 
         userId = intent.getStringExtra("userId")
-        imageView = findViewById(R.id.imageView) as ImageView
+        imageView = findViewById(R.id.editIconImageView) as ImageView
 
         if (USE_LOCAL_DB) {
             try {
