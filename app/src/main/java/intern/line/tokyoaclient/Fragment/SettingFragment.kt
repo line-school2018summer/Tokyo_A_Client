@@ -51,8 +51,6 @@ class SettingFragment : Fragment() {
     }
 
     private lateinit var v: View
-    private lateinit var editNameButton: Button
-    private lateinit var logoutButton: Button
     private lateinit var editIconButton: ImageView
     private lateinit var settingList: ListView
 
@@ -60,10 +58,7 @@ class SettingFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_setting, container, false)
-        editNameButton = v.findViewById(R.id.editNameButton) as Button
-        editNameButton.setOnClickListener {
-            goNameEdit()
-        }
+
 
         editIcon = v.findViewById(R.id.editIcon) as ImageView
         editIcon.setOnClickListener {
@@ -73,11 +68,6 @@ class SettingFragment : Fragment() {
         editIconButton =  v.findViewById(R.id.editIconImageView) as ImageView
         editIconButton.setOnClickListener {
             goIconEdit()
-        }
-
-        logoutButton = v.findViewById(R.id.logoutButton) as Button
-        logoutButton.setOnClickListener {
-            logout()
         }
 
         settingList = v.findViewById(R.id.settingListView) as ListView
