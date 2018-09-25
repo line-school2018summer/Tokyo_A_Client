@@ -10,7 +10,7 @@
 
     <ImageView
         android:id="@android:id/icon"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_centerHorizontal="true"/>
@@ -18,10 +18,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="10dp"
+        android:textSize="11dp"
         android:text="Contacts"
         android:textColor="@color/colorWhite"
-        android:paddingBottom="6dp"
+        android:paddingBottom="8dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"/>
 
